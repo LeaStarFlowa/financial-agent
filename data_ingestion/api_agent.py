@@ -12,19 +12,17 @@ class APIAgent:
         self.cache = {}
 
     def get_market_data(self, symbols, start_date=None, end_date=None):
-        """
-        Fetch market data from Yahoo Finance with proper error handling and date parsing.
+        """通过适当的错误处理和日期解析从雅虎财经获取市场数据。
         
-        Args:
-            symbols: List of stock symbols to fetch
-            start_date: Start date (YYYY-MM-DD format or None for 30 days ago)
-            end_date: End date (YYYY-MM-DD format or None for today)
+        参数：
+            符号：要获取的股票符号列表
+            start_date：开始日期（YYYY-MM-DD 格式或 None 表示 30 天前）
+            end_date：结束日期（YYYY-MM-DD 格式或今天无）
             
-        Returns:
-            Dictionary with symbol keys and DataFrame values, or empty dict if all fail
-        """
+        返回：
+            带有符号键和 DataFrame 值的字典，如果全部失败则为空字典"""
         try:
-            # Parse dates properly
+            # 正确解析日期
             if not end_date:
                 end_date = datetime.now().strftime('%Y-%m-%d')
             if not start_date:
@@ -47,7 +45,7 @@ class APIAgent:
                             failed_symbols.append(symbol)
                             continue
                         
-                        # Reset index to make the date a column for easier serialization
+                        # 重置索引以使日期成为一列，以便于序列化
                         hist = hist.reset_index()
                         hist['Date'] = hist['Date'].astype(str)
                         self.cache[symbol] = hist
@@ -75,27 +73,25 @@ class APIAgent:
             return {}
 
     def get_earnings(self, symbol):
-        """
-        Fetch earnings data for a given symbol using income statement.
+        """使用损益表获取给定代码的收益数据。
         
-        Args:
-            symbol: Stock symbol
+        参数：
+            代码： 股票代码
             
-        Returns:
-            Earnings DataFrame or None if failed
-        """
+        返回：
+            收益数据框，如果失败则无"""
         try:
             logger.info(f"Fetching earnings/income statement for {symbol}...")
             ticker = yf.Ticker(symbol)
             
-            # Try to get income statement (new API)
+            # 尝试获取损益表（新API）
             try:
                 income_stmt = ticker.income_stmt
                 if income_stmt is not None and not income_stmt.empty:
-                    # Extract Net Income row if available
+                    # 提取净利润行（如果有）
                     if 'Net Income' in income_stmt.index:
                         net_income = income_stmt.loc['Net Income']
-                        # Convert to DataFrame with Year and Earnings columns
+                        # 转换为包含“年份”和“收入”列的 DataFrame
                         earnings_df = pd.DataFrame({
                             'Year': net_income.index.year if hasattr(net_income.index, 'year') else range(len(net_income)),
                             'Earnings': net_income.values
@@ -105,7 +101,7 @@ class APIAgent:
             except Exception as e:
                 logger.warning(f"Could not fetch income_stmt for {symbol}: {str(e)}")
             
-            # Try financials as fallback
+            # 尝试将财务作为备用
             try:
                 financials = ticker.financials
                 if financials is not None and not financials.empty:
@@ -128,22 +124,20 @@ class APIAgent:
             return None
     
     def serialize_market_data(self, data):
-        """
-        Convert market data DataFrames to JSON-serializable format.
+        """将市场数据 DataFrame 转换为 JSON 可序列化格式。
         
-        Args:
-            data: Dictionary with symbol keys and DataFrame values
+        参数：
+            data：带有符号键和 DataFrame 值的字典
             
-        Returns:
-            Dictionary with symbol keys and serializable data
-        """
+        返回：
+            具有符号键和可序列化数据的字典"""
         try:
             serialized = {}
             for symbol, df in data.items():
                 if isinstance(df, pd.DataFrame):
-                    # Convert to records format
+                    # 转换为记录格式
                     records = df.to_dict(orient='records')
-                    # Ensure all values are JSON serializable
+                    # 确保所有值都是 JSON 可序列化的
                     serialized_records = []
                     for record in records:
                         serialized_record = {}
@@ -153,7 +147,7 @@ class APIAgent:
                             elif isinstance(value, (int, float, str, bool, type(None))):
                                 serialized_record[key] = value
                             else:
-                                # Convert other types to string
+                                # 将其他类型转换为字符串
                                 serialized_record[key] = str(value)
                         serialized_records.append(serialized_record)
                     serialized[symbol] = serialized_records

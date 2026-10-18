@@ -11,23 +11,21 @@ class ScrapingAgent:
         pass
 
     def scrape_news(self, urls, timeout=10):
-        """
-        Fetch news articles. First tries to extract symbol from URL and use yfinance,
-        then falls back to newspaper scraping if needed.
+        """获取新闻文章。首先尝试从 URL 中提取符号并使用 yfinance，
+        如果需要的话，然后再退回到报纸上。
         
-        Args:
-            urls: List of URLs (can be Yahoo Finance quote pages or article URLs)
-            timeout: Timeout in seconds for scraping operations
+        参数：
+            urls：URL 列表（可以是雅虎财经报价页面或文章 URL）
+            timeout：抓取操作的超时时间（以秒为单位）
             
-        Returns:
-            List of article dictionaries with title, text, url, and publish_date
-        """
+        返回：
+            包含标题、文本、url 和发布日期的文章词典列表"""
         try:
             articles = []
             
             for url in urls:
-                # Try to extract symbol from Yahoo Finance quote URL
-                # Format: https://finance.yahoo.com/quote/SYMBOL/news/
+                # 尝试从雅虎财经报价 URL 中提取符号
+                # 格式：https://finance.yahoo.com/quote/SYMBOL/news/
                 if 'finance.yahoo.com/quote/' in url:
                     try:
                         symbol = url.split('/quote/')[1].split('/')[0]
@@ -37,12 +35,12 @@ class ScrapingAgent:
                         news_items = ticker.news
                         
                         if news_items:
-                            for item in news_items[:5]:  # Limit to 5 most recent articles
-                                # Use summary, or title, or create from available fields
+                            for item in news_items[:5]:  # 限制为 5 篇最新文章
+                                # 使用摘要或标题，或从可用字段创建
                                 text = item.get('summary', '') or item.get('title', '')
                                 title = item.get('title', 'Market Update')
                                 
-                                # Ensure we have actual content
+                                # 确保我们有实际内容
                                 if not text or len(text.strip()) < 10:
                                     text = f"{title}. Market activity for {symbol}."
                                 
@@ -59,7 +57,7 @@ class ScrapingAgent:
                     except Exception as e:
                         logger.warning(f"Could not fetch news via yfinance for {url}: {str(e)}")
                 
-                # Fallback to newspaper scraping for direct article URLs
+                # 回退到报纸抓取直接文章 URL
                 try:
                     article = Article(url)
                     article.download()

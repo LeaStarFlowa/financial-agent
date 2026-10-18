@@ -12,7 +12,7 @@
 
 ## Overview
 
-The **Multi-Agent AI Finance Assistant** is an open-source platform designed to provide intelligent financial analysis and decision-making support using a multi-agent AI framework. Leveraging large language models (Google Gemini) and advanced financial algorithms, this project enables users to perform tasks such as equity research, market forecasting, portfolio optimization, risk assessment, and earnings predictions. The system employs a modular, agent-based architecture where specialized AI agents collaborate to deliver precise and actionable financial insights.
+The **Multi-Agent AI Finance Assistant** is an open-source platform designed to provide intelligent financial analysis and decision-making support using a multi-agent AI framework. Leveraging large language models (Alibaba Qwen) and advanced financial algorithms, this project enables users to perform tasks such as equity research, market forecasting, portfolio optimization, risk assessment, and earnings predictions. The system employs a modular, agent-based architecture where specialized AI agents collaborate to deliver precise and actionable financial insights.
 
 **Key Capabilities:**
 - 📊 **460+ Global Stocks**: Coverage of US, Asian, European markets, ETFs, and cryptocurrencies
@@ -34,7 +34,7 @@ The application is now **fully deployed** with:
 - ✅ Streamlit frontend running smoothly
 - ✅ FastAPI backend operational and synchronized
 - ✅ Real-time market data integration
-- ✅ AI-powered analysis with Google Gemini
+- ✅ AI-powered analysis with Alibaba Qwen
 - ✅ Interactive charts and visualizations
 
 ---
@@ -42,7 +42,7 @@ The application is now **fully deployed** with:
 ## 📋 Recent Updates (v2.0.0)
 
 **✨ Major improvements:**
-- Fixed dependency conflicts (matplotlib, google-generativeai added)
+- Simplified LLM integration with the DashScope-compatible HTTP API
 - Synchronized code across app.py, orchestrator, and streamlit_app
 - Enhanced error handling with safe type conversions
 - Improved comparison table with real market data calculations
@@ -53,7 +53,7 @@ The application is now **fully deployed** with:
 Due to potential limitations on cloud platforms (Streamlit Cloud, Render, etc.), you may experience:
 - **Render timeout issues**: Long-running queries or Streamlit Cloud sleep mode
 - **Free trial limitations**: Resource constraints on free tier services
-- **Gemini API rate limits**: 50 requests/day on free tier may be exhausted
+- **Qwen API quotas**: Account or model quotas may be exhausted
 - **Slow response times**: Cold starts and limited server resources
 
 **🎯 Recommended:** For the best experience with full functionality, **run locally**:
@@ -74,7 +74,7 @@ Local deployment eliminates timeouts, rate limits, and resource constraints. See
 ## Key Features
 
 - **Multi-Agent Collaboration**: Specialized agents (API Agent, Scraping Agent, Retriever Agent, Analysis Agent, Language Agent, Prediction Agent, Graphing Agent, Voice Agent) work together to process financial data and provide comprehensive insights.
-- **LLM-Powered Analysis**: Integrates Google Gemini (gemini-2.0-flash-exp, gemini-2.5-pro) for natural language understanding and financial reasoning with intelligent fallback mechanisms.
+- **LLM-Powered Analysis**: Integrates Alibaba Qwen (`qwen3.8-max`) through Model Studio for natural language understanding and financial reasoning with intelligent fallback mechanisms.
 - **Financial Data Integration**: 
   - Real-time market data via Yahoo Finance API
   - 460+ stocks from major global exchanges (US, Korea, Japan, Hong Kong, India, UK, Germany, France, Switzerland, Canada, Australia)
@@ -131,7 +131,7 @@ Local deployment eliminates timeouts, rate limits, and resource constraints. See
   - Yahoo Finance API (yfinance) for real-time market data
   - BeautifulSoup & Newspaper3k for news scraping
 - **AI/ML:**
-  - Google Gemini (gemini-2.0-flash-exp, gemini-2.5-pro) via google-generativeai
+  - Alibaba Qwen (`qwen3.8-max`) via the Model Studio OpenAI-compatible API
   - LangChain for RAG implementation
   - Scikit-learn for earnings prediction (polynomial regression)
   - FAISS for vector similarity search
@@ -152,7 +152,7 @@ Local deployment eliminates timeouts, rate limits, and resource constraints. See
 | **API Agent** (`api_agent.py`) | Fetches real-time market data from Yahoo Finance, handles data serialization | yfinance, pandas |
 | **Scraping Agent** (`scrapping_agent.py`) | Scrapes financial news with intelligent fallback mechanisms | newspaper3k, BeautifulSoup |
 | **Retriever Agent** (`retriever_agent.py`) | Implements RAG with FAISS vector store for document retrieval | LangChain, FAISS |
-| **Language Agent** (`language_agent.py`) | Generates market briefs using Google Gemini with fallback handling | google-generativeai, Gemini 2.0/2.5 |
+| **Language Agent** (`language_agent.py`) | Generates market briefs using Alibaba Qwen with fallback handling | Model Studio API, Qwen 3.8 Max |
 | **Analysis Agent** (`analysis_agent.py`) | Calculates portfolio risk exposure and performs statistical analysis | pandas, NumPy |
 | **Prediction Agent** (`prediction_agent.py`) | Forecasts earnings and growth rates using ML regression | scikit-learn, NumPy |
 | **Graphing Agent** (`graphing_agent.py`) | Creates interactive visualizations and comparison charts | matplotlib, pandas |
@@ -171,7 +171,7 @@ The financial industry demands rapid, accurate, and data-driven decisions. Tradi
 ### Prerequisites
 - Python 3.10 or higher
 - Git
-- Google Gemini API key (Get it free from [Google AI Studio](https://ai.google.dev/))
+- Alibaba Cloud Model Studio API key ([create an API key](https://bailian.console.aliyun.com/?apiKey=1#/api-key))
 - Optional: Docker for containerized deployment
 
 ### Setup
@@ -196,9 +196,9 @@ The financial industry demands rapid, accurate, and data-driven decisions. Tradi
 4. **Configure API Keys**:
    Create a `.env` file in the root directory:
    ```bash
-   GEMINI_API_KEY="your-gemini-api-key-here"
+   DASHSCOPE_API_KEY="your-dashscope-api-key-here"
    ```
-   Get your free API key from: https://ai.google.dev/
+   The default model is `qwen3.8-max`, called through the China (Beijing) endpoint. You can override it with `QWEN_MODEL` and `DASHSCOPE_BASE_URL`.
 
 ### Running the Application
 
@@ -274,15 +274,10 @@ docker run -p 8501:8501 -p 8000:8000 --env-file .env finance-assistant
 
 ## ⚠️ API Rate Limits
 
-**Google Gemini Free Tier Limits:**
-- `gemini-2.0-flash-exp`: 10 requests/min, 1500 requests/day
-- `gemini-2.5-pro`: 50 requests/day
-
-**Recommendations:**
-1. Use `gemini-2.0-flash-exp` for high-frequency queries
-2. Create multiple Google Cloud projects for extended quotas
-3. Upgrade to paid tier for production use: https://ai.google.dev/pricing
-4. System has intelligent fallback to ensure continuous operation
+**Alibaba Cloud Model Studio Quotas:**
+- Quotas and pricing vary by model and account.
+- Review the current limits in the Model Studio console before production use.
+- The system falls back to a local structured report when Qwen is unavailable.
 
 ## 🏗️ Architecture
 
@@ -306,7 +301,7 @@ docker run -p 8501:8501 -p 8000:8000 --env-file .env finance-assistant
     │         │         │         │         │        │
     ▼         ▼         ▼         ▼         ▼        ▼
 ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-│ Yahoo  │ │  Web   │ │ FAISS  │ │ NumPy  │ │ Gemini │ │Sklearn │
+│ Yahoo  │ │  Web   │ │ FAISS  │ │ NumPy  │ │  Qwen  │ │Sklearn │
 │Finance │ │Scraping│ │  DB    │ │ Stats  │ │  LLM   │ │   ML   │
 └────────┘ └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
 ```
@@ -324,7 +319,7 @@ The application is now **fully operational** with:
 | **Streamlit Frontend** | ✅ Running | Interactive UI with 460+ stocks |
 | **FastAPI Backend** | ✅ Running | Orchestrator handling all AI agents |
 | **Market Data (Yahoo Finance)** | ✅ Active | Real-time stock data integration |
-| **AI Analysis (Google Gemini)** | ✅ Active | gemini-2.0-flash-exp, gemini-2.5-pro |
+| **AI Analysis (Alibaba Qwen)** | ✅ Active | qwen3.8-max |
 | **Charts & Visualization** | ✅ Working | Comparison charts, earnings trends |
 | **Earnings Predictions** | ✅ Working | ML-based forecasting with sklearn |
 | **News Scraping** | ✅ Working | With intelligent fallback system |
@@ -336,20 +331,20 @@ When running on **Streamlit Cloud, Render, or similar free tier services**, you 
 **Potential Issues:**
 - 🕐 **Render/Server Timeouts**: 30-second timeout on Render free tier may cut off long-running queries
 - 💤 **Streamlit Cloud Sleep**: App goes to sleep after inactivity, causing slow startup
-- 📊 **Gemini API Rate Limits**: Free tier has 50 requests/day limit (may be shared if using same API key)
+- 📊 **Qwen API Quotas**: Account or model quotas may limit requests
 - 🔌 **Connection Timeouts**: Intermittent connection issues due to resource constraints
 - ⚡ **Slow Response Times**: Cold starts and limited server CPU/RAM
 
 **Solutions:**
 1. **🏠 Run Locally** (RECOMMENDED) - Eliminates all timeout and resource issues
 2. **💳 Upgrade to Paid Tier** - Render hobby plan or Streamlit+ for better resources
-3. **🔑 Get Higher API Quotas** - Upgrade Google Gemini from free to paid tier
-4. **📝 Use Multiple API Keys** - Rotate through different Google Cloud projects
+3. **🔑 Get Higher API Quotas** - Review or upgrade your Alibaba Cloud Model Studio quota
+4. **📝 Monitor Usage** - Track token usage and request limits in the Model Studio console
 
 **👉 For best results: Clone and run locally following the [Installation](#installation) section**
 
 ### Recent Fixes (v2.0.0)
-- ✅ Added missing `matplotlib` and `google-generativeai` dependencies
+- ✅ Added `matplotlib` and switched LLM calls to the existing `requests` dependency
 - ✅ Fixed protobuf version conflicts with streamlit and other packages
 - ✅ Resolved unsafe float conversions in comparison metrics
 - ✅ Enhanced market data table with real calculations
@@ -375,7 +370,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - Yahoo Finance for providing real-time market data
-- Google Gemini for powerful AI capabilities
+- Alibaba Qwen for powerful AI capabilities
 - LangChain for RAG implementation framework
 - Streamlit for the beautiful UI framework
 - FastAPI for the high-performance backend

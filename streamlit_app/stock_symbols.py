@@ -1,11 +1,9 @@
-"""
-Comprehensive stock symbol database for Yahoo Finance
-This module provides access to major stocks across global markets
-"""
+"""雅虎财经综合股票代码数据库
+该模块提供对全球市场主要股票的访问"""
 
-# Major US Stock Exchanges - Most Popular Stocks
+# 美国主要证券交易所 - 最受欢迎的股票
 US_STOCKS = {
-    # FAANG/Tech Giants
+    # FAANG/科技巨头
     "AAPL": "Apple Inc.",
     "MSFT": "Microsoft Corporation",
     "GOOGL": "Alphabet Inc. (Google) - Class A",
@@ -16,7 +14,7 @@ US_STOCKS = {
     "TSLA": "Tesla Inc.",
     "NFLX": "Netflix Inc.",
     
-    # Other Major Tech
+    # 其他主要技术
     "ADBE": "Adobe Inc.",
     "CRM": "Salesforce Inc.",
     "ORCL": "Oracle Corporation",
@@ -34,14 +32,14 @@ US_STOCKS = {
     "CDNS": "Cadence Design Systems Inc.",
     "ASML": "ASML Holding N.V.",
     
-    # Semiconductors
+    # 半导体
     "TSM": "Taiwan Semiconductor Manufacturing",
     "MU": "Micron Technology Inc.",
     "MRVL": "Marvell Technology Inc.",
     "NXPI": "NXP Semiconductors N.V.",
     "ON": "ON Semiconductor Corporation",
     
-    # Social Media & Entertainment
+    # 社交媒体和娱乐
     "DIS": "The Walt Disney Company",
     "CMCSA": "Comcast Corporation",
     "T": "AT&T Inc.",
@@ -53,7 +51,7 @@ US_STOCKS = {
     "PINS": "Pinterest Inc.",
     "TWTR": "Twitter Inc.",
     
-    # E-commerce & Payments
+    # 电子商务与支付
     "PYPL": "PayPal Holdings Inc.",
     "SQ": "Block Inc. (Square)",
     "SHOP": "Shopify Inc.",
@@ -63,7 +61,7 @@ US_STOCKS = {
     "PDD": "Pinduoduo Inc.",
     "MELI": "MercadoLibre Inc.",
     
-    # Electric Vehicles & Auto
+    # 电动汽车及汽车
     "F": "Ford Motor Company",
     "GM": "General Motors Company",
     "RIVN": "Rivian Automotive Inc.",
@@ -74,7 +72,7 @@ US_STOCKS = {
     "TM": "Toyota Motor Corporation",
     "HMC": "Honda Motor Co. Ltd.",
     
-    # Finance & Banking
+    # 金融与银行
     "JPM": "JPMorgan Chase & Co.",
     "BAC": "Bank of America Corporation",
     "WFC": "Wells Fargo & Company",
@@ -88,7 +86,7 @@ US_STOCKS = {
     "MA": "Mastercard Incorporated",
     "COF": "Capital One Financial Corporation",
     
-    # Healthcare & Pharma
+    # 医疗保健与制药
     "JNJ": "Johnson & Johnson",
     "UNH": "UnitedHealth Group Incorporated",
     "PFE": "Pfizer Inc.",
@@ -102,7 +100,7 @@ US_STOCKS = {
     "BMY": "Bristol-Myers Squibb Company",
     "CVS": "CVS Health Corporation",
     
-    # Retail & Consumer
+    # 零售与消费品
     "WMT": "Walmart Inc.",
     "HD": "The Home Depot Inc.",
     "COST": "Costco Wholesale Corporation",
@@ -114,14 +112,14 @@ US_STOCKS = {
     "KO": "The Coca-Cola Company",
     "PEP": "PepsiCo Inc.",
     
-    # Energy
+    # 活力
     "XOM": "Exxon Mobil Corporation",
     "CVX": "Chevron Corporation",
     "COP": "ConocoPhillips",
     "SLB": "Schlumberger Limited",
     "EOG": "EOG Resources Inc.",
     
-    # Industrial
+    # 工业的
     "BA": "Boeing Company",
     "CAT": "Caterpillar Inc.",
     "GE": "General Electric Company",
@@ -130,14 +128,14 @@ US_STOCKS = {
     "UPS": "United Parcel Service Inc.",
     "FDX": "FedEx Corporation",
     
-    # Real Estate & REITs
+    # 房地产与房地产投资信托基金
     "AMT": "American Tower Corporation",
     "PLD": "Prologis Inc.",
     "CCI": "Crown Castle Inc.",
     "EQIX": "Equinix Inc.",
     "SPG": "Simon Property Group Inc.",
     
-    # Cloud & Software
+    # 云与软件
     "NOW": "ServiceNow Inc.",
     "SNOW": "Snowflake Inc.",
     "DDOG": "Datadog Inc.",
@@ -149,13 +147,13 @@ US_STOCKS = {
     "ZM": "Zoom Video Communications Inc.",
     "DOCU": "DocuSign Inc.",
     
-    # Crypto & Fintech
+    # 加密货币与金融科技
     "COIN": "Coinbase Global Inc.",
     "HOOD": "Robinhood Markets Inc.",
     "SOFI": "SoFi Technologies Inc.",
     "AFRM": "Affirm Holdings Inc.",
     
-    # Biotech
+    # 生物技术
     "MRNA": "Moderna Inc.",
     "BNTX": "BioNTech SE",
     "REGN": "Regeneron Pharmaceuticals Inc.",
@@ -163,31 +161,31 @@ US_STOCKS = {
     "BIIB": "Biogen Inc.",
     "ILMN": "Illumina Inc.",
     
-    # Media & Entertainment
+    # 媒体与娱乐
     "WBD": "Warner Bros. Discovery Inc.",
     "PARA": "Paramount Global",
     "NFLX": "Netflix Inc.",
     "ROKU": "Roku Inc.",
     
-    # Semiconductors Extended
+    # 半导体扩展
     "MPWR": "Monolithic Power Systems Inc.",
     "SWKS": "Skyworks Solutions Inc.",
     "QRVO": "Qorvo Inc.",
     "MKSI": "MKS Instruments Inc.",
     "ENTG": "Entegris Inc.",
     
-    # Cybersecurity
+    # 网络安全
     "FTNT": "Fortinet Inc.",
     "CHKP": "Check Point Software Technologies",
     "OKTA": "Okta Inc.",
     "S": "SentinelOne Inc.",
     
-    # E-commerce Extended
+    # 电子商务延伸
     "ETSY": "Etsy Inc.",
     "W": "Wayfair Inc.",
     "CHWY": "Chewy Inc.",
     
-    # Travel & Hospitality
+    # 旅游与酒店业
     "ABNB": "Airbnb Inc.",
     "BKNG": "Booking Holdings Inc.",
     "EXPE": "Expedia Group Inc.",
@@ -201,7 +199,7 @@ US_STOCKS = {
     "AAL": "American Airlines Group Inc.",
     "LUV": "Southwest Airlines Co.",
     
-    # Food & Beverage
+    # 食品及饮料
     "KHC": "The Kraft Heinz Company",
     "MDLZ": "Mondelez International Inc.",
     "GIS": "General Mills Inc.",
@@ -212,11 +210,11 @@ US_STOCKS = {
     "TAP": "Molson Coors Beverage Company",
     "STZ": "Constellation Brands Inc.",
     
-    # Automotive Extended
+    # 汽车扩展
     "STLA": "Stellantis N.V.",
     "MBLY": "Mobileye Global Inc.",
     
-    # Healthcare Equipment
+    # 医疗保健设备
     "ISRG": "Intuitive Surgical Inc.",
     "SYK": "Stryker Corporation",
     "EW": "Edwards Lifesciences Corporation",
@@ -226,7 +224,7 @@ US_STOCKS = {
     "PODD": "Insulet Corporation",
     "ZBH": "Zimmer Biomet Holdings Inc.",
     
-    # Insurance
+    # 保险
     "BRK-B": "Berkshire Hathaway Inc.",
     "PGR": "The Progressive Corporation",
     "ALL": "The Allstate Corporation",
@@ -235,18 +233,18 @@ US_STOCKS = {
     "PRU": "Prudential Financial Inc.",
     "AFL": "Aflac Incorporated",
     
-    # Telecom Extended
+    # 电信延伸
     "TMUS": "T-Mobile US Inc.",
     "DISH": "DISH Network Corporation",
     
-    # Consumer Products
+    # 消费品
     "PG": "The Procter & Gamble Company",
     "CL": "Colgate-Palmolive Company",
     "KMB": "Kimberly-Clark Corporation",
     "EL": "The Estée Lauder Companies Inc.",
     "CLX": "The Clorox Company",
     
-    # Apparel
+    # 服饰
     "LULU": "Lululemon Athletica Inc.",
     "UAA": "Under Armour Inc.",
     "CROX": "Crocs Inc.",
@@ -255,24 +253,24 @@ US_STOCKS = {
     "TPR": "Tapestry Inc.",
     "CPRI": "Capri Holdings Limited",
     
-    # Restaurants
+    # 餐厅
     "YUM": "Yum! Brands Inc.",
     "QSR": "Restaurant Brands International",
     "CMG": "Chipotle Mexican Grill Inc.",
     "DPZ": "Domino's Pizza Inc.",
     "WEN": "The Wendy's Company",
     
-    # Gaming
+    # 赌博
     "EA": "Electronic Arts Inc.",
     "TTWO": "Take-Two Interactive Software",
     "ATVI": "Activision Blizzard Inc.",
     "U": "Unity Software Inc.",
     
-    # Rideshare & Mobility
+    # 乘车共享和出行
     "UBER": "Uber Technologies Inc.",
     "LYFT": "Lyft Inc.",
     
-    # Real Estate Extended
+    # 房地产延伸
     "O": "Realty Income Corporation",
     "PSA": "Public Storage",
     "INVH": "Invitation Homes Inc.",
@@ -281,7 +279,7 @@ US_STOCKS = {
     "VTR": "Ventas Inc.",
     "WELL": "Welltower Inc.",
     
-    # Utilities
+    # 公用事业
     "NEE": "NextEra Energy Inc.",
     "DUK": "Duke Energy Corporation",
     "SO": "The Southern Company",
@@ -291,7 +289,7 @@ US_STOCKS = {
     "SRE": "Sempra Energy",
     "XEL": "Xcel Energy Inc.",
     
-    # Materials
+    # 材料
     "LIN": "Linde plc",
     "APD": "Air Products and Chemicals Inc.",
     "ECL": "Ecolab Inc.",
@@ -300,7 +298,7 @@ US_STOCKS = {
     "NEM": "Newmont Corporation",
     "FCX": "Freeport-McMoRan Inc.",
     
-    # Defense & Aerospace
+    # 国防与航空航天
     "LMT": "Lockheed Martin Corporation",
     "RTX": "Raytheon Technologies Corporation",
     "NOC": "Northrop Grumman Corporation",
@@ -308,24 +306,24 @@ US_STOCKS = {
     "LHX": "L3Harris Technologies Inc.",
     "HII": "Huntington Ingalls Industries",
     
-    # Construction & Engineering
+    # 建筑与工程
     "DE": "Deere & Company",
     "EMR": "Emerson Electric Co.",
     "ETN": "Eaton Corporation plc",
     "PH": "Parker-Hannifin Corporation",
     "ROK": "Rockwell Automation Inc.",
     
-    # Waste Management
+    # 废物管理
     "WM": "Waste Management Inc.",
     "RSG": "Republic Services Inc.",
     
-    # Medical Devices
+    # 医疗器械
     "ABT": "Abbott Laboratories",
     "DHR": "Danaher Corporation",
     "A": "Agilent Technologies Inc.",
     "BAX": "Baxter International Inc.",
     
-    # Pharma Extended
+    # 制药扩展
     "NVO": "Novo Nordisk A/S",
     "AZN": "AstraZeneca PLC",
     "SNY": "Sanofi",
@@ -333,9 +331,9 @@ US_STOCKS = {
     "TAK": "Takeda Pharmaceutical Company",
 }
 
-# Asian Markets
+# 亚洲市场
 ASIAN_STOCKS = {
-    # Korean Stocks (KS = Korea Stock Exchange)
+    # 韩国股票（KS = 韩国证券交易所）
     "005930.KS": "Samsung Electronics Co. Ltd.",
     "000660.KS": "SK Hynix Inc.",
     "035720.KS": "Kakao Corporation",
@@ -347,7 +345,7 @@ ASIAN_STOCKS = {
     "068270.KS": "Celltrion Inc.",
     "012330.KS": "Hyundai Mobis Co. Ltd.",
     
-    # Japanese Stocks (T = Tokyo Stock Exchange)
+    # 日本股票（T = 东京证券交易所）
     "7203.T": "Toyota Motor Corporation",
     "6758.T": "Sony Group Corporation",
     "9984.T": "SoftBank Group Corp.",
@@ -359,7 +357,7 @@ ASIAN_STOCKS = {
     "9432.T": "Nippon Telegraph & Telephone",
     "6501.T": "Hitachi Ltd.",
     
-    # Chinese Stocks (HK = Hong Kong)
+    # 中国股票（HK=香港）
     "0700.HK": "Tencent Holdings Limited",
     "9988.HK": "Alibaba Group Holding Limited",
     "3690.HK": "Meituan",
@@ -369,7 +367,7 @@ ASIAN_STOCKS = {
     "1398.HK": "Industrial and Commercial Bank of China",
     "9618.HK": "JD.com Inc.",
     
-    # Indian Stocks (NS = NSE, BO = BSE)
+    # 印度股票（NS = NSE，BO = BSE）
     "RELIANCE.NS": "Reliance Industries Limited",
     "TCS.NS": "Tata Consultancy Services Limited",
     "INFY.NS": "Infosys Limited",
@@ -386,20 +384,20 @@ ASIAN_STOCKS = {
     "SUNPHARMA.NS": "Sun Pharmaceutical Industries",
     "MARUTI.NS": "Maruti Suzuki India Limited",
     
-    # Taiwan Stocks
+    # 台股
     "2330.TW": "Taiwan Semiconductor Manufacturing",
     "2317.TW": "Hon Hai Precision Industry (Foxconn)",
     "2454.TW": "MediaTek Inc.",
     
-    # Singapore Stocks
+    # 新加坡股票
     "D05.SI": "DBS Group Holdings Ltd",
     "O39.SI": "Oversea-Chinese Banking Corp",
     "U11.SI": "United Overseas Bank Ltd",
 }
 
-# European Markets
+# 欧洲市场
 EUROPEAN_STOCKS = {
-    # UK Stocks (L = London Stock Exchange)
+    # 英国股票（L = 伦敦证券交易所）
     "BP.L": "BP plc",
     "HSBA.L": "HSBC Holdings plc",
     "SHEL.L": "Shell plc",
@@ -409,7 +407,7 @@ EUROPEAN_STOCKS = {
     "DGE.L": "Diageo plc",
     "RIO.L": "Rio Tinto Group",
     
-    # German Stocks (DE = XETRA)
+    # 德国股票 (DE = XETRA)
     "SAP.DE": "SAP SE",
     "VOW3.DE": "Volkswagen AG",
     "SIE.DE": "Siemens AG",
@@ -419,14 +417,14 @@ EUROPEAN_STOCKS = {
     "BMW.DE": "Bayerische Motoren Werke AG",
     "DAI.DE": "Daimler AG",
     
-    # French Stocks (PA = Paris)
+    # 法国股票（PA = 巴黎）
     "MC.PA": "LVMH Moët Hennessy Louis Vuitton",
     "OR.PA": "L'Oréal S.A.",
     "SAN.PA": "Sanofi",
     "TTE.PA": "TotalEnergies SE",
     "AIR.PA": "Airbus SE",
     
-    # Swiss Stocks (SW = Swiss Exchange)
+    # 瑞士股票（SW = 瑞士交易所）
     "NESN.SW": "Nestlé S.A.",
     "NOVN.SW": "Novartis AG",
     "ROG.SW": "Roche Holding AG",
@@ -434,31 +432,31 @@ EUROPEAN_STOCKS = {
     "ABBN.SW": "ABB Ltd",
     "UBSG.SW": "UBS Group AG",
     
-    # Netherlands
+    # 荷兰
     "ASML.AS": "ASML Holding N.V.",
     "PHIA.AS": "Koninklijke Philips N.V.",
     "HEIA.AS": "Heineken N.V.",
     
-    # Spain
+    # 西班牙
     "TEF.MC": "Telefónica S.A.",
     "SAN.MC": "Banco Santander S.A.",
     "IBE.MC": "Iberdrola S.A.",
     
-    # Italy
+    # 意大利
     "RACE.MI": "Ferrari N.V.",
     "ENI.MI": "Eni S.p.A.",
     "ISP.MI": "Intesa Sanpaolo S.p.A.",
     
-    # Sweden
+    # 瑞典
     "VOLV-B.ST": "Volvo AB",
     "ERIC-B.ST": "Telefonaktiebolaget LM Ericsson",
     
-    # Denmark
+    # 丹麦
     "NOVO-B.CO": "Novo Nordisk A/S",
     "MAERSK-B.CO": "A.P. Møller - Mærsk A/S",
 }
 
-# Canadian Stocks
+# 加拿大股票
 CANADIAN_STOCKS = {
     "SHOP.TO": "Shopify Inc.",
     "RY.TO": "Royal Bank of Canada",
@@ -477,7 +475,7 @@ CANADIAN_STOCKS = {
     "ABX.TO": "Barrick Gold Corporation",
 }
 
-    # Australian Stocks
+    # 澳洲股票
 AUSTRALIAN_STOCKS = {
     "CBA.AX": "Commonwealth Bank of Australia",
     "BHP.AX": "BHP Group Limited",
@@ -489,16 +487,16 @@ AUSTRALIAN_STOCKS = {
     "WOW.AX": "Woolworths Group Limited",
     "FMG.AX": "Fortescue Metals Group Limited",
     "MQG.AX": "Macquarie Group Limited",
-}# Market Indices and ETFs
+}# 市场指数和 ETF
 INDICES_AND_ETFS = {
-    # Major US Indices
+    # 美国主要指数
     "^GSPC": "S&P 500",
     "^DJI": "Dow Jones Industrial Average",
     "^IXIC": "NASDAQ Composite",
     "^RUT": "Russell 2000",
     "^VIX": "CBOE Volatility Index",
     
-    # Popular ETFs
+    # 热门ETF
     "SPY": "SPDR S&P 500 ETF Trust",
     "QQQ": "Invesco QQQ Trust",
     "IWM": "iShares Russell 2000 ETF",
@@ -534,20 +532,20 @@ INDICES_AND_ETFS = {
     "ARKF": "ARK Fintech Innovation ETF",
     "ARKG": "ARK Genomic Revolution ETF",
     
-    # International ETFs
+    # 国际ETF
     "IEMG": "iShares Core MSCI Emerging Markets ETF",
     "IXUS": "iShares Core MSCI Total International Stock ETF",
     "VXUS": "Vanguard Total International Stock ETF",
     "ACWI": "iShares MSCI ACWI ETF",
     "VT": "Vanguard Total World Stock ETF",
     
-    # Bond ETFs
+    # 债券ETF
     "VCIT": "Vanguard Intermediate-Term Corporate Bond ETF",
     "VCSH": "Vanguard Short-Term Corporate Bond ETF",
     "MUB": "iShares National Muni Bond ETF",
     "BNDX": "Vanguard Total International Bond ETF",
     
-    # Commodity ETFs
+    # 商品ETF
     "GDX": "VanEck Gold Miners ETF",
     "GDXJ": "VanEck Junior Gold Miners ETF",
     "PSLV": "Sprott Physical Silver Trust",
@@ -556,39 +554,39 @@ INDICES_AND_ETFS = {
     "CORN": "Teucrium Corn Fund",
     "WEAT": "Teucrium Wheat Fund",
     
-    # Real Estate ETFs
+    # 房地产ETF
     "VNQ": "Vanguard Real Estate ETF",
     "IYR": "iShares U.S. Real Estate ETF",
     "SCHH": "Schwab U.S. REIT ETF",
     
-    # Dividend ETFs
+    # 股息ETF
     "VYM": "Vanguard High Dividend Yield ETF",
     "SCHD": "Schwab U.S. Dividend Equity ETF",
     "DGRO": "iShares Core Dividend Growth ETF",
     "DVY": "iShares Select Dividend ETF",
     
-    # Growth ETFs
+    # 成长型ETF
     "VUG": "Vanguard Growth ETF",
     "IVW": "iShares S&P 500 Growth ETF",
     "SCHG": "Schwab U.S. Large-Cap Growth ETF",
     
-    # Value ETFs
+    # 价值ETF
     "VTV": "Vanguard Value ETF",
     "IVE": "iShares S&P 500 Value ETF",
     "SCHV": "Schwab U.S. Large-Cap Value ETF",
     
-    # Small Cap ETFs
+    # 小盘ETF
     "IJR": "iShares Core S&P Small-Cap ETF",
     "VB": "Vanguard Small-Cap ETF",
     "SCHA": "Schwab U.S. Small-Cap ETF",
     
-    # Mid Cap ETFs
+    # 中盘ETF
     "IJH": "iShares Core S&P Mid-Cap ETF",
     "VO": "Vanguard Mid-Cap ETF",
     "SCHM": "Schwab U.S. Mid-Cap ETF",
 }
 
-# Cryptocurrencies (available on Yahoo Finance)
+# 加密货币（可在雅虎财经上找到）
 CRYPTO = {
     "BTC-USD": "Bitcoin USD",
     "ETH-USD": "Ethereum USD",
@@ -612,7 +610,7 @@ CRYPTO = {
     "ARB-USD": "Arbitrum USD",
 }
 
-# Combine all stocks
+# 合并所有股票
 ALL_STOCKS = {
     **US_STOCKS,
     **ASIAN_STOCKS,
@@ -623,40 +621,40 @@ ALL_STOCKS = {
     **CRYPTO,
 }
 
-# Categories for organized display
+# 有组织显示的类别
 CATEGORIES = {
-    "🇺🇸 US Tech Giants": ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "NVDA", "TSLA", "NFLX"],
-    "💻 Semiconductors": ["TSM", "NVDA", "INTC", "AMD", "QCOM", "MU", "AVGO", "TXN", "ASML", "AMAT", "LRCX"],
-    "🚗 Electric Vehicles & Auto": ["TSLA", "RIVN", "LCID", "NIO", "LI", "XPEV", "F", "GM", "TM", "HMC"],
-    "🏦 Finance & Banking": ["JPM", "BAC", "GS", "MS", "V", "MA", "AXP", "SCHW", "BLK", "C", "WFC"],
-    "🏥 Healthcare & Pharma": ["JNJ", "UNH", "PFE", "ABBV", "TMO", "LLY", "MRNA", "BNTX", "MRK", "GILD"],
-    "🛒 Retail & Consumer": ["WMT", "AMZN", "HD", "COST", "TGT", "NKE", "SBUX", "MCD", "LOW", "TJX"],
-    "☁️ Cloud & Software": ["CRM", "NOW", "SNOW", "DDOG", "CRWD", "ZS", "PANW", "WDAY", "ADBE", "ORCL"],
-    "✈️ Travel & Hospitality": ["ABNB", "BKNG", "MAR", "HLT", "DAL", "UAL", "CCL", "RCL"],
-    "🎮 Gaming & Entertainment": ["RBLX", "EA", "TTWO", "ATVI", "U", "DIS", "NFLX"],
-    "🌏 Asian Tech & Markets": ["005930.KS", "TSM", "BABA", "0700.HK", "7203.T", "6758.T", "9984.T"],
-    "🇮🇳 Indian Markets": ["RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS", "WIPRO.NS"],
-    "🌍 European Markets": ["SAP.DE", "ASML", "NESN.SW", "MC.PA", "AZN.L", "NOVN.SW", "SHEL.L"],
-    "📊 Major US ETFs": ["SPY", "QQQ", "VTI", "VOO", "IWM", "DIA", "VEA", "VWO"],
-    "💎 Sector ETFs": ["XLF", "XLE", "XLK", "XLV", "XLI", "XLP", "XLY", "XLU"],
-    "📈 Growth & Value ETFs": ["VUG", "IVW", "VTV", "IVE", "ARKK", "ARKW"],
-    "₿ Top Cryptocurrencies": ["BTC-USD", "ETH-USD", "BNB-USD", "SOL-USD", "XRP-USD", "ADA-USD"],
-    "⚡ Energy & Utilities": ["XOM", "CVX", "COP", "SLB", "NEE", "DUK", "SO"],
-    "🏭 Industrial & Defense": ["BA", "CAT", "GE", "HON", "LMT", "RTX", "NOC"],
-    "💳 Fintech & Payments": ["PYPL", "SQ", "COIN", "HOOD", "SOFI", "AFRM", "V", "MA"],
-    "🍔 Food & Beverage": ["KO", "PEP", "SBUX", "MCD", "YUM", "CMG", "KHC"],
-    "🏠 Real Estate": ["AMT", "PLD", "CCI", "EQIX", "O", "VNQ"],
-    "🛡️ Cybersecurity": ["CRWD", "PANW", "ZS", "FTNT", "OKTA", "CHKP"],
+    "🇺🇸 美国科技巨头": ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "NVDA", "TSLA", "NFLX"],
+    "💻 半导体": ["TSM", "NVDA", "INTC", "AMD", "QCOM", "MU", "AVGO", "TXN", "ASML", "AMAT", "LRCX"],
+    "🚗 电动车与汽车": ["TSLA", "RIVN", "LCID", "NIO", "LI", "XPEV", "F", "GM", "TM", "HMC"],
+    "🏦 金融与银行": ["JPM", "BAC", "GS", "MS", "V", "MA", "AXP", "SCHW", "BLK", "C", "WFC"],
+    "🏥 医疗与制药": ["JNJ", "UNH", "PFE", "ABBV", "TMO", "LLY", "MRNA", "BNTX", "MRK", "GILD"],
+    "🛒 零售与消费": ["WMT", "AMZN", "HD", "COST", "TGT", "NKE", "SBUX", "MCD", "LOW", "TJX"],
+    "☁️ 云计算与软件": ["CRM", "NOW", "SNOW", "DDOG", "CRWD", "ZS", "PANW", "WDAY", "ADBE", "ORCL"],
+    "✈️ 旅游与酒店": ["ABNB", "BKNG", "MAR", "HLT", "DAL", "UAL", "CCL", "RCL"],
+    "🎮 游戏与娱乐": ["RBLX", "EA", "TTWO", "ATVI", "U", "DIS", "NFLX"],
+    "🌏 亚洲科技与市场": ["005930.KS", "TSM", "BABA", "0700.HK", "7203.T", "6758.T", "9984.T"],
+    "🇮🇳 印度市场": ["RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS", "WIPRO.NS"],
+    "🌍 欧洲市场": ["SAP.DE", "ASML", "NESN.SW", "MC.PA", "AZN.L", "NOVN.SW", "SHEL.L"],
+    "📊 美国主要 ETF": ["SPY", "QQQ", "VTI", "VOO", "IWM", "DIA", "VEA", "VWO"],
+    "💎 行业 ETF": ["XLF", "XLE", "XLK", "XLV", "XLI", "XLP", "XLY", "XLU"],
+    "📈 成长与价值 ETF": ["VUG", "IVW", "VTV", "IVE", "ARKK", "ARKW"],
+    "₿ 主要加密货币": ["BTC-USD", "ETH-USD", "BNB-USD", "SOL-USD", "XRP-USD", "ADA-USD"],
+    "⚡ 能源与公用事业": ["XOM", "CVX", "COP", "SLB", "NEE", "DUK", "SO"],
+    "🏭 工业与国防": ["BA", "CAT", "GE", "HON", "LMT", "RTX", "NOC"],
+    "💳 金融科技与支付": ["PYPL", "SQ", "COIN", "HOOD", "SOFI", "AFRM", "V", "MA"],
+    "🍔 食品与饮料": ["KO", "PEP", "SBUX", "MCD", "YUM", "CMG", "KHC"],
+    "🏠 房地产": ["AMT", "PLD", "CCI", "EQIX", "O", "VNQ"],
+    "🛡️ 网络安全": ["CRWD", "PANW", "ZS", "FTNT", "OKTA", "CHKP"],
 }
 
 def get_stock_display_name(symbol):
-    """Get display name for a stock symbol"""
+    """获取股票代码的显示名称"""
     if symbol in ALL_STOCKS:
         return f"{symbol} - {ALL_STOCKS[symbol]}"
     return symbol
 
 def search_stocks(query):
-    """Search stocks by symbol or name"""
+    """按代码或名称搜索股票"""
     query = query.lower()
     results = []
     for symbol, name in ALL_STOCKS.items():
@@ -665,7 +663,7 @@ def search_stocks(query):
     return results
 
 def get_category_stocks(category):
-    """Get stocks for a specific category"""
+    """获取指定类别的股票"""
     if category in CATEGORIES:
         return [(symbol, ALL_STOCKS.get(symbol, symbol)) for symbol in CATEGORIES[category]]
     return []

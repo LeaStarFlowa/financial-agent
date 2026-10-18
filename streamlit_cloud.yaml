@@ -1,23 +1,23 @@
-name: Multi-Agent AI Finance Assistant
+name: 多智能体 AI 金融助手
 description: >
-  A Streamlit-based AI finance assistant that delivers market briefs using a multi-agent architecture.
+  基于 Streamlit 的多智能体 AI 金融助手，提供市场简报。
 sdk: streamlit
 sdk_version: 1.45.0
 python_version: 3.9
 base_image: python:3.9-slim
 
-# Configuration specific to Streamlit Cloud deployment
+# Streamlit Cloud 部署专用配置
 build:
-  # Install dependencies before copying app code
+  # 复制应用代码前安装依赖
   - pip install -r requirements.txt
 
-# Environment variables required for the app
+# 应用所需的环境变量
 env:
-  # Use service discovery - FastAPI service will be available at http://fastapi:8000
+  # 通过服务发现访问 FastAPI：http://fastapi:8000
   - name: API_URL
     value: http://fastapi:8000
 
-# Specify services that need to be started
+# 指定需要启动的服务
 services:
   - name: fastapi
     command: uvicorn orchestrator.orchestrator:app --host 0.0.0.0 --port 8000

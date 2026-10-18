@@ -1,6 +1,4 @@
-"""
-Simple retriever without ML embeddings for low-memory environments
-"""
+"""适用于低内存环境的简单检索器，无需 ML 嵌入"""
 import logging
 from difflib import SequenceMatcher
 
@@ -12,7 +10,7 @@ class SimpleRetrieverAgent:
         self.documents = []
 
     def index_documents(self, documents):
-        """Store documents without embeddings"""
+        """存储没有嵌入的文档"""
         try:
             self.documents = documents
             logger.info(f"Indexed {len(documents)} documents")
@@ -20,12 +18,12 @@ class SimpleRetrieverAgent:
             logger.error(f"Error indexing documents: {str(e)}")
 
     def retrieve(self, query, k=3):
-        """Simple keyword-based retrieval"""
+        """简单的基于关键字的检索"""
         try:
             if not self.documents:
                 return []
             
-            # Score documents based on keyword overlap
+            # 根据关键词重叠对文档进行评分
             scored_docs = []
             query_words = set(query.lower().split())
             
@@ -33,17 +31,17 @@ class SimpleRetrieverAgent:
                 text = doc.get('text', '').lower()
                 title = doc.get('title', '').lower()
                 
-                # Count matching words
+                # 计算匹配的单词数
                 text_words = set(text.split())
                 title_words = set(title.split())
                 
                 text_overlap = len(query_words & text_words)
-                title_overlap = len(query_words & title_words) * 2  # Weight titles higher
+                title_overlap = len(query_words & title_words) * 2  # 体重头衔更高
                 
                 score = text_overlap + title_overlap
                 scored_docs.append((score, doc['text']))
             
-            # Sort by score and return top k
+            # 按分数排序并返回前k个
             scored_docs.sort(reverse=True, key=lambda x: x[0])
             results = [doc[1] for doc in scored_docs[:k]]
             

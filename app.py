@@ -17,13 +17,13 @@ from typing import Optional, List
 import re
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# 从 .env 文件加载环境变量
 load_dotenv()
 
-# Add the project root to the path so imports work correctly
+# 将项目根添加到路径中，以便导入正常工作
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-# Import all the agent modules
+# 导入所有智能体模块
 from data_ingestion.api_agent import APIAgent
 from data_ingestion.scrapping_agent import ScrapingAgent
 from agents.retriever_agent import RetrieverAgent
@@ -31,14 +31,14 @@ from agents.analysis_agent import AnalysisAgent
 from agents.language_agent import LanguageAgent 
 from agents.voice_agent import VoiceAgent
 
-# Import comprehensive stock symbols
+# 导入综合股票代码
 from streamlit_app.stock_symbols import ALL_STOCKS, CATEGORIES
 
-# Configure logging
+# 配置日志记录
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize FastAPI app
+# 初始化 FastAPI 应用程序
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -48,7 +48,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize all agents
+# 初始化所有智能体
 api_agent = APIAgent()
 scraping_agent = ScrapingAgent()
 retriever_agent = RetrieverAgent()
@@ -56,12 +56,12 @@ analysis_agent = AnalysisAgent()
 language_agent = LanguageAgent()
 voice_agent = VoiceAgent()
 
-# Default symbols (can be extended)
-DEFAULT_SYMBOLS = ['AAPL', 'MSFT', 'GOOGL']  # Major tech stocks
+# 默认符号（可以扩展）
+DEFAULT_SYMBOLS = ['AAPL', 'MSFT', 'GOOGL']  # 主要科技股
 
-# Enhanced symbol mappings to handle various query formats
+# 增强的符号映射以处理各种查询格式
 SYMBOL_MAPPINGS = {
-    # Tech Giants
+    # 科技巨头
     'tsmc': 'TSM',
     'taiwan semiconductor': 'TSM',
     'samsung': '005930.KS',
@@ -81,7 +81,7 @@ SYMBOL_MAPPINGS = {
     'advanced micro devices': 'AMD',
     'qualcomm': 'QCOM',
     
-    # Additional major companies
+    # 其他主要公司
     'disney': 'DIS',
     'nike': 'NKE',
     'walmart': 'WMT',
@@ -101,69 +101,69 @@ SYMBOL_MAPPINGS = {
     'exxon': 'XOM',
     'chevron': 'CVX',
     
-    # Crypto
+    # 加密货币
     'bitcoin': 'BTC-USD',
     'ethereum': 'ETH-USD',
     'dogecoin': 'DOGE-USD',
     
-    # Indices
+    # 指数
     's&p 500': '^GSPC',
     'sp500': '^GSPC',
     'dow jones': '^DJI',
     'nasdaq': '^IXIC',
 }
 
-# Helper functions
+# 辅助函数
 def extract_symbols_from_query(query):
-    """Extract stock symbols from the query and map to actual ticker symbols"""
+    """从查询中提取股票代码并映射到实际的股票代码"""
     extracted_symbols = []
     
-    # Check for ticker symbols directly (like AAPL, MSFT, etc.)
+    # 直接检查股票代码（如 AAPL、MSFT 等）
     ticker_pattern = r'\b[A-Z]{1,5}\b'
     direct_tickers = re.findall(ticker_pattern, query)
     if direct_tickers:
         extracted_symbols.extend(direct_tickers)
     
-    # Check for company names in the query
+    # 检查查询中的公司名称
     for company, symbol in SYMBOL_MAPPINGS.items():
         if company.lower() in query.lower():
             extracted_symbols.append(symbol)
     
-    # Remove duplicates while preserving order
+    # 删除重复项同时保留顺序
     unique_symbols = []
     for symbol in extracted_symbols:
         if symbol not in unique_symbols:
             unique_symbols.append(symbol)
     
-    # If no symbols were found, use defaults
+    # 如果没有找到符号，则使用默认值
     if not unique_symbols:
         return DEFAULT_SYMBOLS
     
     return unique_symbols
 
-# Initialize with some sample data
+# 使用一些示例数据进行初始化
 try:
-    # Pre-fetch some data to initialize agents
+    # 预取一些数据来初始化智能体
     market_data = api_agent.get_market_data(DEFAULT_SYMBOLS)
     
-    # Initialize retriever with some sample data
+    # 使用一些示例数据初始化检索器
     sample_docs = [
-        {"text": "TSMC reported strong quarterly earnings with record revenue.", "title": "TSMC Earnings"},
-        {"text": "Samsung Electronics faces competition in the memory chip market.", "title": "Samsung Market Position"}
+        {"text": "台积电季度盈利表现强劲，营收创下新高。", "title": "台积电盈利"},
+        {"text": "三星电子在存储芯片市场面临竞争。", "title": "三星市场地位"}
     ]
     retriever_agent.index_documents(sample_docs)
     logger.info("Pre-initialized agents with sample data")
 except Exception as e:
     logger.warning(f"Failed to pre-initialize agents: {str(e)}")
 
-# FastAPI Endpoints
+# FastAPI 端点
 @app.get("/")
 async def health_check():
-    return {"status": "healthy", "message": "Finance Assistant API is running"}
+    return {"status": "healthy", "message": "金融助手 API 正在运行"}
 
 @app.get("/debug/test-scraping")
 async def test_scraping(symbol: str = "AAPL"):
-    """Debug endpoint to test news scraping functionality"""
+    """调试端点以测试新闻抓取功能"""
     try:
         logger.info(f"Testing news scraping for {symbol}")
         url = f"https://finance.yahoo.com/quote/{symbol}/news/"
@@ -174,14 +174,14 @@ async def test_scraping(symbol: str = "AAPL"):
             "symbol": symbol,
             "articles_found": len(articles),
             "sample_article": articles[0] if articles else None,
-            "message": f"Successfully scraped {len(articles)} articles" if articles else "No articles found - will use fallback data"
+            "message": f"成功抓取 {len(articles)} 篇文章" if articles else "未找到文章，将使用备用数据"
         }
     except Exception as e:
         logger.error(f"Error in test scraping: {str(e)}")
         return {
             "status": "error",
             "error": str(e),
-            "message": "Scraping failed - system will use fallback data"
+            "message": "抓取失败，系统将使用备用数据"
         }
 
 @app.get("/retrieve/retrieve")
@@ -192,17 +192,17 @@ async def retrieve(
     try:
         logger.info(f"Processing retrieve request for query: {query}")
         
-        # Step 1: Extract symbols from the query or use explicitly provided symbols
+        # 步骤 1：从查询中提取符号或使用显式提供的符号
         if symbols:
-            # If explicit symbols are provided, use them
+            # 如果提供了明确的符号，请使用它们
             symbol_list = [s.strip() for s in symbols.split(",")]
             logger.info(f"Using explicitly provided symbols: {symbol_list}")
         else:
-            # Otherwise extract them from the query
+            # 否则从查询中提取它们
             symbol_list = extract_symbols_from_query(query)
             logger.info(f"Extracted symbols from query: {symbol_list}")
         
-        # Step 2: Validate and fetch market data
+        # 第 2 步：验证并获取市场数据
         if not symbol_list:
             logger.warning("No symbols found, using defaults")
             symbol_list = DEFAULT_SYMBOLS
@@ -212,15 +212,15 @@ async def retrieve(
         
         if not market_data:
             logger.error(f"Failed to fetch market data for symbols: {symbol_list}")
-            # Return helpful error message
+            # 返回有用的错误消息
             return {
-                "error": f"Could not fetch data for symbols: {', '.join(symbol_list)}. Please check if the symbols are valid Yahoo Finance tickers.",
+                "error": f"无法获取以下股票代码的数据：{', '.join(symbol_list)}。请检查代码是否为有效的 Yahoo Finance 股票代码。",
                 "query": query,
                 "attempted_symbols": symbol_list,
-                "suggestion": "Try using common symbols like AAPL, MSFT, GOOGL, or check Yahoo Finance for the correct ticker."
+                "suggestion": "请尝试使用 AAPL、MSFT、GOOGL 等常见代码，或在 Yahoo Finance 核对正确代码。"
             }
         
-        # Convert market data to a serializable format using the agent's method
+        # 使用智能体方法将市场数据转换为可序列化格式
         logger.info(f"Serializing market data for {list(market_data.keys())}")
         serialized_market_data = api_agent.serialize_market_data(market_data)
         
@@ -230,61 +230,61 @@ async def retrieve(
         
         logger.info(f"Successfully serialized data: {list(serialized_market_data.keys())}")
         
-        # Step 3: Generate news URLs based on symbols
-        news_urls = [f"https://finance.yahoo.com/quote/{symbol}/news/" for symbol in symbol_list[:3]]  # Limit to first 3 symbols
+        # 步骤3：根据符号生成新闻URL
+        news_urls = [f"https://finance.yahoo.com/quote/{symbol}/news/" for symbol in symbol_list[:3]]  # 仅限前 3 个符号
         logger.info(f"🔍 Attempting to scrape news from: {news_urls}")
         articles = scraping_agent.scrape_news(news_urls, timeout=15)
         logger.info(f"📰 News scraping result: {len(articles)} articles collected")
         
         if not articles:
-            # If scraping failed, create rich fallback content based on actual market data
+            # 如果抓取失败，根据实际市场数据创建丰富的备用内容
             logger.warning("⚠️ News scraping failed - generating fallback articles from market data")
             articles = []
             for symbol in symbol_list:
                 company_name = ALL_STOCKS.get(symbol, symbol)
                 
-                # Create detailed fallback content using actual market data
-                article_text = f"{company_name} Market Analysis: "
+                # 使用实际市场数据创建详细的备用内容
+                article_text = f"{company_name} 市场分析："
                 
                 if symbol in market_data:
                     try:
                         market_df = market_data[symbol]
                         if not market_df.empty and len(market_df) > 0:
-                            # Get recent trading data
+                            # 获取近期交易数据
                             latest_close = market_df['Close'].iloc[-1] if 'Close' in market_df.columns else None
                             latest_volume = market_df['Volume'].iloc[-1] if 'Volume' in market_df.columns else None
                             
-                            # Calculate price change if we have enough data
+                            # 如果我们有足够的数据，计算价格变化
                             if len(market_df) > 1 and 'Close' in market_df.columns:
                                 prev_close = market_df['Close'].iloc[-2]
                                 price_change = ((latest_close - prev_close) / prev_close * 100) if prev_close > 0 else 0
                                 
-                                article_text += f"Recent trading shows price at ${latest_close:.2f}, "
+                                article_text += f"近期交易价格为 ${latest_close:.2f}, "
                                 if price_change > 0:
-                                    article_text += f"up {price_change:.2f}% from previous close. "
+                                    article_text += f"up {price_change:.2f}%，相较前一收盘价。"
                                 else:
-                                    article_text += f"down {abs(price_change):.2f}% from previous close. "
+                                    article_text += f"down {abs(price_change):.2f}%，相较前一收盘价。"
                             elif latest_close:
-                                article_text += f"Current price at ${latest_close:.2f}. "
+                                article_text += f"当前价格为 ${latest_close:.2f}. "
                             
                             if latest_volume:
-                                article_text += f"Trading volume: {latest_volume:,.0f} shares. "
+                                article_text += f"成交量：{latest_volume:,.0f} shares. "
                             
-                            # Add 52-week context if available
+                            # 添加 52 周的背景（如果有）
                             if len(market_df) > 50 and 'High' in market_df.columns and 'Low' in market_df.columns:
                                 recent_high = market_df['High'].tail(50).max()
                                 recent_low = market_df['Low'].tail(50).min()
-                                article_text += f"Recent trading range: ${recent_low:.2f} - ${recent_high:.2f}."
+                                article_text += f"近期交易区间：${recent_low:.2f} - ${recent_high:.2f}."
                         else:
-                            article_text += "Market data retrieved successfully for analysis."
+                            article_text += "已成功获取用于分析的市场数据。"
                     except Exception as e:
                         logger.warning(f"Error creating detailed fallback for {symbol}: {str(e)}")
-                        article_text += "Active in current market conditions."
+                        article_text += "在当前市场环境下仍有交易活动。"
                 else:
-                    article_text += "Market data retrieved for portfolio analysis."
+                    article_text += "已获取用于投资组合分析的市场数据。"
                 
                 articles.append({
-                    "title": f"{company_name} - Market Data Update", 
+                    "title": f"{company_name}：市场数据更新",
                     "text": article_text,
                     "url": f"https://finance.yahoo.com/quote/{symbol}"
                 })
@@ -292,26 +292,26 @@ async def retrieve(
         else:
             logger.info(f"✅ Successfully scraped {len(articles)} real news articles")
         
-        # Step 4: Index and retrieve
+        # 第 4 步：索引和检索
         logger.info(f"Indexing {len(articles)} documents for retrieval")
         retriever_agent.index_documents(articles)
         context_docs = retriever_agent.retrieve(query, k=3)
         
-        # Handle the context properly - it might be empty or have a different structure
+        # 正确处理上下文 - 它可能是空的或具有不同的结构
         context = []
         if context_docs:
             if hasattr(context_docs[0], 'page_content'):
-                # LangChain Document objects
+                # LangChain文档对象
                 context = [doc.page_content for doc in context_docs]
             elif isinstance(context_docs[0], dict):
-                # Dictionary objects
+                # 字典对象
                 context = [doc.get('text', str(doc)) for doc in context_docs]
             else:
-                # Direct text objects
+                # 直接文本对象
                 context = [str(doc) for doc in context_docs]
         
         if not context or len(context) == 0:
-            # If retrieval failed, create rich fallback context with actual market data
+            # 如果检索失败，请使用实际市场数据创建丰富的备用上下文
             logger.warning("⚠️ Document retrieval failed - creating fallback context from market data")
             context = []
             for symbol in symbol_list:
@@ -319,7 +319,7 @@ async def retrieve(
                 
                 if symbol in serialized_market_data and serialized_market_data[symbol]:
                     try:
-                        # Create detailed context from market data
+                        # 从市场数据创建详细的背景
                         records = serialized_market_data[symbol]
                         if records and len(records) > 0:
                             latest = records[-1]
@@ -329,29 +329,29 @@ async def retrieve(
                             context_text = f"{company_name} Analysis: "
                             
                             if 'Close' in latest:
-                                context_text += f"Current price ${latest['Close']:.2f}. "
+                                context_text += f"当前价格 ${latest['Close']:.2f}. "
                             
                             if closes and len(closes) > 1:
                                 avg_close = sum(closes) / len(closes)
-                                context_text += f"Average price over period: ${avg_close:.2f}. "
+                                context_text += f"期间平均价格：${avg_close:.2f}. "
                                 
-                                # Calculate volatility
+                                # 计算波动率
                                 price_range = max(closes) - min(closes)
                                 volatility_pct = (price_range / avg_close) * 100 if avg_close > 0 else 0
-                                context_text += f"Price volatility: {volatility_pct:.1f}%. "
+                                context_text += f"价格波动率：{volatility_pct:.1f}%. "
                             
                             if volumes:
                                 avg_volume = sum(volumes) / len(volumes)
-                                context_text += f"Average daily volume: {avg_volume:,.0f} shares."
+                                context_text += f"日均成交量：{avg_volume:,.0f} shares."
                             
                             context.append(context_text)
                         else:
-                            context.append(f"{company_name} market data retrieved successfully for analysis.")
+                            context.append(f"{company_name} 的市场数据已成功获取，可用于分析。")
                     except Exception as e:
                         logger.warning(f"Error creating detailed context for {symbol}: {str(e)}")
-                        context.append(f"{company_name} included in portfolio analysis.")
+                        context.append(f"{company_name} 已纳入投资组合分析。")
                 else:
-                    context.append(f"{company_name} market data retrieved for evaluation.")
+                    context.append(f"{company_name} 的市场数据已获取，可用于评估。")
         
         logger.info(f"✅ Retrieved {len(context)} context documents for analysis")
         return {
@@ -369,7 +369,7 @@ async def analyze(data: dict):
     try:
         logger.info("Processing analyze request")
         
-        # Extract data safely with fallbacks
+        # 通过回退安全地提取数据
         market_data = {}
         symbols = data.get("data", {}).get("symbols", DEFAULT_SYMBOLS)
         
@@ -381,12 +381,12 @@ async def analyze(data: dict):
                 
                 logger.info(f"Converting serialized data for {list(serialized_data.keys())}")
                 
-                # Convert serialized market data back to DataFrame format
+                # 将序列化市场数据转换回 DataFrame 格式
                 market_data = {}
                 for symbol, records in serialized_data.items():
                     try:
                         if isinstance(records, list):
-                            if records:  # Only create DataFrame if records is not empty
+                            if records:  # 仅当记录不为空时才创建 DataFrame
                                 market_data[symbol] = pd.DataFrame.from_records(records)
                                 logger.info(f"Created DataFrame for {symbol} with {len(records)} records")
                             else:
@@ -396,53 +396,53 @@ async def analyze(data: dict):
                             logger.info(f"Using raw data for {symbol}")
                     except Exception as e:
                         logger.error(f"Error creating DataFrame for {symbol}: {str(e)}")
-                        # Create a dummy dataframe
+                        # 创建一个虚拟数据框
                         market_data[symbol] = pd.DataFrame({'Close': [100.0]})
         except Exception as e:
             logger.warning(f"Error processing market data: {str(e)}")
-            # Use empty dataframes as fallback
+            # 使用空数据帧作为备用
             market_data = {}
             for symbol in symbols:
                 market_data[symbol] = pd.DataFrame({'Close': [100.0]})
         
         context = data.get("data", {}).get("context", [])
         if not context:
-            context = [f"Analysis of {', '.join(symbols)} stocks"]
+            context = [f"股票分析：{', '.join(symbols)}"]
         
-        query = data.get("data", {}).get("query", f"What's our risk exposure in {', '.join(symbols)}?")
+        query = data.get("data", {}).get("query", f"以下股票有哪些风险敞口：{', '.join(symbols)}？")
         
-        logger.info(f"Query: {query}, Context items: {len(context)}")
+        logger.info(f"问题： {query}, Context items: {len(context)}")
         
-        # Update the analysis agent's portfolio to include the queried symbols
+        # 更新分析智能体的投资组合以包含查询的股票
         portfolio_weights = {}
         for i, symbol in enumerate(symbols):
-            # Assign decreasing weights to each symbol
-            portfolio_weights[symbol] = 0.15 - (i * 0.02)  # Start at 15% and decrease
-            if portfolio_weights[symbol] < 0.05:  # Minimum weight of 5%
+            # 为每个符号分配递减的权重
+            portfolio_weights[symbol] = 0.15 - (i * 0.02)  # 从 15% 开始并逐渐减少
+            if portfolio_weights[symbol] < 0.05:  # 最低重量5%
                 portfolio_weights[symbol] = 0.05
         
         logger.info(f"Portfolio weights: {portfolio_weights}")
         
-        # Update the portfolio
+        # 更新投资组合
         analysis_agent.portfolio = portfolio_weights
         
-        # Step 2: Analyze risk
+        # 第 2 步：分析风险
         exposure = analysis_agent.analyze_risk_exposure(market_data)
         logger.info(f"Risk exposure analysis complete: {list(exposure.keys()) if exposure else 'None'}")
         
         if not exposure:
-            # Fallback exposure data if analysis fails
+            # 如果分析失败，备用暴露数据
             logger.warning("Using fallback exposure data")
             exposure = {}
-            total_aum = 1000000  # Example AUM of $1M
+            total_aum = 1000000  # 资产管理规模为 100 万美元的示例
             for symbol in symbols:
                 exposure[symbol] = {
                     'weight': portfolio_weights.get(symbol, 0.10),
                     'value': portfolio_weights.get(symbol, 0.10) * total_aum,
-                    'price': 100.0  # Default price
+                    'price': 100.0  # 默认价格
                 }
         
-        # Step 3: Get earnings
+        # 第三步：获取收益
         earnings = {}
         
         for symbol in symbols:
@@ -451,7 +451,7 @@ async def analyze(data: dict):
                 earnings_data = api_agent.get_earnings(symbol)
                 if earnings_data is None:
                     logger.warning(f"No earnings data for {symbol}, using fallback")
-                    # Fallback earnings data
+                    # 回落盈利数据
                     earnings[symbol] = pd.DataFrame({
                         'Year': [2023, 2024],
                         'Earnings': [10.5, 12.3]
@@ -460,13 +460,13 @@ async def analyze(data: dict):
                     earnings[symbol] = earnings_data
             except Exception as e:
                 logger.warning(f"Error fetching earnings for {symbol}: {str(e)}")
-                # Fallback earnings data
+                # 回落盈利数据
                 earnings[symbol] = pd.DataFrame({
                     'Year': [2023, 2024],
                     'Earnings': [10.5, 12.3]
                 })
         
-        # Convert earnings to serializable format
+        # 将收入转换为可序列化格式
         serialized_earnings = {}
         for symbol, data_df in earnings.items():
             try:
@@ -479,7 +479,7 @@ async def analyze(data: dict):
                 logger.warning(f"Error serializing earnings for {symbol}: {str(e)}")
                 serialized_earnings[symbol] = []
         
-        # Step 4: Generate brief
+        # 第 4 步：生成简报
         try:
             logger.info("Generating brief from language agent")
             brief = language_agent.generate_brief(
@@ -492,52 +492,52 @@ async def analyze(data: dict):
             logger.info("Brief generated successfully")
         except Exception as e:
             logger.warning(f"Error generating brief: {str(e)}, using fallback")
-            # Generate a more dynamic fallback brief
+            # 生成更具动态性的备用简介
             symbol_names = []
             for symbol in symbols:
                 company_name = ALL_STOCKS.get(symbol, symbol)
                 symbol_names.append(f"{company_name} ({symbol})")
             
-            brief = f"""## Market Brief: {query}
+            brief = f"""## 市场简报： {query}
 
-### Portfolio Analysis for {', '.join(symbol_names)}
+### 投资组合分析：{', '.join(symbol_names)}
 
-Our analysis focuses on exposure to the following securities in our portfolio.
+以下分析关注投资组合中各证券的风险敞口。
 
-#### Market Data Retrieved
-- Successfully retrieved current market data for {len(symbols)} securities
-- Data includes OHLCV (Open, High, Low, Close, Volume) for the analysis period
+#### 已获取的市场数据
+- 成功获取 {len(symbols)} 只证券的当前市场数据
+- 数据包括分析期间的 OHLCV（开盘、最高、最低、收盘价和成交量）
 
-#### Portfolio Composition
+#### 投资组合构成
 """
             
-            # Add exposure details
+            # 添加风险敞口细节
             total_value = sum([d.get('value', 100000) for d in exposure.values()])
             for symbol, exp_data in exposure.items():
                 company_name = ALL_STOCKS.get(symbol, symbol)
                 weight_pct = exp_data.get('weight', 0.1) * 100
                 value = exp_data.get('value', 100000)
                 price = exp_data.get('price', 100.0)
-                brief += f"\n- **{company_name} ({symbol})**: {weight_pct:.1f}% allocation (${value:,.0f}) @ ${price:.2f}"
+                brief += f"\n- **{company_name} ({symbol})**: {weight_pct:.1f}% 配置 (${value:,.0f}) @ ${price:.2f}"
             
             brief += f"""
 
-#### Key Insights
-The portfolio maintains a diversified exposure across the analyzed securities. Recent market data shows:
-- Historical price movements have been tracked for the period
-- Volume patterns indicate typical market activity
-- All selected securities continue to maintain market presence
+#### 主要观察
+投资组合分散配置于所分析的证券。近期市场数据显示：
+- 已追踪该期间的历史价格走势
+- 成交量变化反映了市场交易活动
+- 所选证券仍在市场中交易
 
-#### Earnings Overview
+#### 盈利概览
 """
             
             for symbol in symbols:
                 company_name = ALL_STOCKS.get(symbol, symbol)
-                brief += f"\n- {company_name}: Latest earnings data retrieved"
+                brief += f"\n- {company_name}: 已获取最新盈利数据"
             
-            brief += "\n\nRecommendation: Monitor these positions according to your risk tolerance and investment objectives."
+            brief += "\n\n建议：结合自身风险承受能力和投资目标，持续关注这些持仓。"
         
-        logger.info("Analysis completed successfully")
+        logger.info("分析完成")
         return {"summary": brief}
     except Exception as e:
         logger.error(f"Error analyzing data: {str(e)}", exc_info=True)
@@ -549,64 +549,64 @@ async def process_query(
     symbols: Optional[str] = Form(None)
 ):
     try:
-        # Step 1: Convert speech to text
+        # 第 1 步：将语音转换为文本
         query = voice_agent.speech_to_text(audio.file)
         
         if not query:
-            query = "What's our risk exposure in technology stocks?"
+            query = "以下股票有哪些风险敞口：technology stocks?"
             logger.info("Using fallback query due to STT failure")
 
-        # Step 2: Extract symbols from query or use provided symbols
+        # 步骤 2：从查询中提取符号或使用提供的符号
         if symbols:
             symbol_list = [s.strip() for s in symbols.split(",")]
             logger.info(f"Using explicitly provided symbols for voice query: {symbol_list}")
         else:
             symbol_list = extract_symbols_from_query(query)
         
-        # Step 3: Fetch market data
+        # 第三步：获取市场数据
         market_data = api_agent.get_market_data(symbol_list)
         
         if not market_data:
             logger.error("Failed to fetch market data")
             raise HTTPException(status_code=500, detail="Failed to fetch market data")
 
-        # Step 4: Scrape news
+        # 第四步：抓取新闻
         news_urls = [f"https://finance.yahoo.com/quote/{symbol}/news/" for symbol in symbol_list[:2]]
         logger.info(f"Scraping news from URLs: {news_urls}")
         articles = scraping_agent.scrape_news(news_urls)
         
         if not articles:
-            # If scraping failed, use fallback content based on actual market data
+            # 如果抓取失败，则根据实际市场数据使用备用内容
             logger.warning("News scraping failed, using fallback articles")
             articles = []
             for symbol in symbol_list:
                 company_name = ALL_STOCKS.get(symbol, symbol)
                 
-                # Try to include some data from market_data in the fallback
-                article_text = f"{company_name} continues to be a key player in the market. "
+                # 尝试在备用中包含 market_data 中的一些数据
+                article_text = f"{company_name} 仍是相关市场的重要参与者。"
                 
                 if symbol in market_data:
                     try:
                         market_df = market_data[symbol]
                         if not market_df.empty:
                             latest_close = market_df['Close'].iloc[-1] if 'Close' in market_df.columns else 'N/A'
-                            article_text += f"Latest closing price: {latest_close}. "
+                            article_text += f"最新收盘价：{latest_close}. "
                     except:
                         pass
                 
                 articles.append({
-                    "title": f"{company_name} Market Update", 
+                    "title": f"{company_name}：市场动态",
                     "text": article_text,
                     "url": f"https://finance.yahoo.com/quote/{symbol}"
                 })
         else:
-            logger.info(f"Successfully scraped {len(articles)} articles")
+            logger.info(f"成功抓取 {len(articles)} 篇文章")
 
-        # Step 5: Index and retrieve
+        # 第 5 步：索引和检索
         retriever_agent.index_documents(articles)
         context_docs = retriever_agent.retrieve(query, k=3)
         
-        # Handle the context properly
+        # 正确处理上下文
         context = []
         if context_docs:
             if hasattr(context_docs[0], 'page_content'):
@@ -617,7 +617,7 @@ async def process_query(
         if not context:
             context = [f"Analysis of {', '.join(symbol_list)} stocks"]
 
-        # Update the analysis agent's portfolio to include the queried symbols
+        # 更新分析智能体的投资组合以包含查询的股票
         portfolio_weights = {}
         for i, symbol in enumerate(symbol_list):
             portfolio_weights[symbol] = 0.15 - (i * 0.02)
@@ -626,13 +626,13 @@ async def process_query(
         
         analysis_agent.portfolio = portfolio_weights
         
-        # Step 6: Analyze risk
+        # 第 6 步：分析风险
         exposure = analysis_agent.analyze_risk_exposure(market_data)
         
         if not exposure:
-            # Fallback exposure data
+            # 备用风险敞口数据
             exposure = {}
-            total_aum = 1000000  # Example AUM
+            total_aum = 1000000  # 资产管理规模示例
             for symbol in symbol_list:
                 exposure[symbol] = {
                     'weight': portfolio_weights.get(symbol, 0.10),
@@ -640,7 +640,7 @@ async def process_query(
                     'price': 100.0
                 }
 
-        # Step 7: Get earnings
+        # 第7步：获取收益
         earnings = {}
         for symbol in symbol_list:
             earnings_data = api_agent.get_earnings(symbol)
@@ -651,79 +651,79 @@ async def process_query(
                 })
             earnings[symbol] = earnings_data
 
-        # Step 8: Generate brief
+        # 第 8 步：生成简报
         try:
             brief = language_agent.generate_brief(str(context), str(exposure), str(earnings))
         except Exception as e:
             logger.error(f"Error generating brief: {str(e)}")
-            # Generate a dynamic fallback brief
+            # 生成动态备用简介
             symbol_names = []
             for symbol in symbol_list:
                 company_name = ALL_STOCKS.get(symbol, symbol)
                 symbol_names.append(f"{company_name} ({symbol})")
             
             brief = f"""
-            Market Brief for your query about {query}:
+            关于“{query}”的市场简报：
             
-            Analysis of {', '.join(symbol_names)}:
+            分析标的：{', '.join(symbol_names)}：
             
-            Our portfolio has exposure to these key technology companies with varying weights.
+            投资组合以不同权重配置了这些公司。
             """
             
-            # Add exposure details
-            brief += "\nPortfolio Exposure:\n"
+            # 添加风险敞口细节
+            brief += "\n投资组合风险敞口：\n"
             for symbol, data in exposure.items():
                 company_name = ALL_STOCKS.get(symbol, symbol)
                 weight_pct = data.get('weight', 0.1) * 100
                 value = data.get('value', 100000)
                 brief += f"- {company_name} ({symbol}): {weight_pct:.1f}% (${value:,.0f})\n"
             
-            brief += "\nThe companies have generally shown positive earnings trends from 2023 to 2024."
+            brief += "\n相关公司的盈利趋势请结合最新数据进一步核对。"
     
 
 
-        # Step 9: Convert to speech
+        # 第 9 步：转换为语音
         audio_response = voice_agent.text_to_speech(brief)
         
         if audio_response is None:
             logger.error("TTS failed to generate audio")
             raise HTTPException(status_code=500, detail="TTS failed to generate audio")
 
-        logger.info("Query processed successfully")
+        logger.info("问题处理完成")
         return StreamingResponse(audio_response, media_type="audio/mp3")
     except Exception as e:
         logger.error(f"Error processing query: {str(e)}")
         return {"error": str(e)}
 
-# Function to start FastAPI in a separate thread
+# 在单独的线程中启动 FastAPI 的函数
 def run_fastapi():
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
-# Start FastAPI in a background thread when this script runs
+# 当此脚本运行时，在后台线程中启动 FastAPI
 threading.Thread(target=run_fastapi, daemon=True).start()
 
-# Now define the Streamlit app
+# 现在定义 Streamlit 应用程序
 def main():
-    st.title("🧠 Morning Market Brief Assistant")
+    st.title("🧠 晨间市场简报助手")
     st.markdown("""
-    This application provides market insights and financial analysis on your portfolio or specific stocks.
-    Enter a query about specific stocks or market conditions to get an AI-generated analysis.
+    本应用提供投资组合和个股的市场洞察与财务分析。
+    输入有关股票或市场状况的问题，获取 AI 生成的分析。
     """)
     
-    # Stock selection feature
-    st.sidebar.header("Stock Selection")
-    st.sidebar.markdown("Select from all available stocks or enter custom symbols:")
+    # 选股功能
+    st.sidebar.header("股票选择")
+    st.sidebar.markdown("从股票列表选择，或输入自定义代码：")
     
-    # Build comprehensive stocks list from ALL_STOCKS
-    # Add "All Stocks" category + pre-defined categories
-    common_stocks = {"🔷 All Stocks (A-Z)": []}
+    # 从 ALL_STOCKS 建立全面的股票列表
+    # 添加“所有股票”类别+预定义类别
+    common_stocks = {"🔷 全部股票（A-Z）": []}
     
-    # Add all stocks to the "All Stocks" category
+    # 将所有股票添加到“所有股票”类别
     for symbol, name in sorted(ALL_STOCKS.items()):
         display_name = f"{symbol} ({name})"
-        common_stocks["🔷 All Stocks (A-Z)"].append(display_name)
+        common_stocks["🔷 全部股票（A-Z）"].append(display_name)
     
-    # Add pre-defined categories from stock_symbols.py
+    # 从 stock_symbols.py 添加预定义类别
     for category_name, symbols in CATEGORIES.items():
         common_stocks[category_name] = []
         for symbol in symbols:
@@ -731,36 +731,36 @@ def main():
                 display_name = f"{symbol} ({ALL_STOCKS[symbol]})"
                 common_stocks[category_name].append(display_name)
     
-    # Remove empty categories
+    # 删除空类别
     common_stocks = {k: v for k, v in common_stocks.items() if v}
     
-    st.sidebar.info(f"📊 Total available stocks: {len(ALL_STOCKS)}")
+    st.sidebar.info(f"📊 可选股票总数：{len(ALL_STOCKS)}")
     
-    selected_category = st.sidebar.selectbox("Industry Sector", list(common_stocks.keys()))
+    selected_category = st.sidebar.selectbox("行业类别", list(common_stocks.keys()))
     
-    # Add search functionality
-    search_term = st.sidebar.text_input("🔍 Search stocks", placeholder="Type company name or symbol...")
+    # 添加搜索功能
+    search_term = st.sidebar.text_input("🔍 搜索股票", placeholder="输入公司名称或股票代码……")
     
-    # Filter stocks based on search
+    # 根据搜索过滤股票
     available_stocks = common_stocks[selected_category]
     if search_term:
         available_stocks = [s for s in available_stocks if search_term.upper() in s.upper()]
-        st.sidebar.caption(f"Found {len(available_stocks)} matches")
+        st.sidebar.caption(f"找到 {len(available_stocks)} 个结果")
     
     selected_stocks = st.sidebar.multiselect(
-        "Select stocks to analyze", 
+        "选择要分析的股票",
         available_stocks,
-        help="Choose one or more stocks from the selected sector"
+        help="从所选行业中选择一只或多只股票"
     )
     
-    # Show all available symbols in an expander
-    with st.sidebar.expander("📋 View All Available Symbols"):
-        st.markdown(f"### All {len(ALL_STOCKS)} Available Stocks")
+    # 显示扩展器中的所有可用符号
+    with st.sidebar.expander("📋 查看所有可用股票代码"):
+        st.markdown(f"### 全部 {len(ALL_STOCKS)} 可用股票")
         
-        # Group symbols alphabetically
+        # 按字母顺序对符号进行分组
         all_symbols = sorted(ALL_STOCKS.keys())
         
-        # Display in columns for better readability
+        # 以列显示以获得更好的可读性
         col1, col2 = st.columns(2)
         mid_point = len(all_symbols) // 2
         
@@ -770,10 +770,10 @@ def main():
             st.code("\n".join(all_symbols[mid_point:]))
         
         st.markdown("---")
-        st.markdown("### Symbol → Company Name Mapping")
-        st.caption("Browse alphabetically organized mappings below")
+        st.markdown("### 股票代码 → 公司名称对照")
+        st.caption("下方按字母顺序列出对照关系")
         
-        # Show mapping organized by first letter (without nested expanders)
+        # 显示按首字母组织的映射（无嵌套扩展器）
         letters = {}
         for symbol, company in sorted(ALL_STOCKS.items()):
             first_letter = symbol[0].upper()
@@ -781,170 +781,170 @@ def main():
                 letters[first_letter] = []
             letters[first_letter].append(f"{symbol} → {company}")
         
-        # Display all mappings grouped by letter in a scrollable text area
+        # 在可滚动文本区域中显示按字母分组的所有映射
         mapping_text = ""
         for letter in sorted(letters.keys()):
-            mapping_text += f"\n━━━ {letter} ({len(letters[letter])} stocks) ━━━\n"
+            mapping_text += f"\n━━━ {letter} ({len(letters[letter])} 只股票) ━━━\n"
             for mapping in letters[letter]:
                 mapping_text += f"{mapping}\n"
         
-        st.text_area("All Stock Mappings (A-Z)", mapping_text, height=300, help="Scroll to view all symbol to company name mappings")
+        st.text_area("所有股票代码对照（A-Z）", mapping_text, height=300, help="滚动查看所有股票代码与公司名称的对应关系")
         
         st.markdown("---")
-        st.markdown("### Custom Symbol Entry")
-        st.info("💡 You can also type any valid Yahoo Finance ticker symbol directly in your query (e.g., AAPL, MSFT, TSM, BTC-USD)")
+        st.markdown("### 输入自定义股票代码")
+        st.info("💡 也可在问题中直接输入有效的 Yahoo Finance 股票代码 (例如 AAPL、MSFT、TSM, BTC-USD)")
     
-    # Quick reference guide for symbol formats
-    with st.sidebar.expander("📖 Symbol Format Guide"):
+    # 符号格式快速参考指南
+    with st.sidebar.expander("📖 股票代码格式指南"):
         st.markdown("""
-        **Stock Symbol Formats:**
-        - 🇺🇸 US: `AAPL`, `MSFT`, `GOOGL`
-        - 🇰🇷 Korea: `005930.KS` (Samsung)
-        - 🇯🇵 Japan: `7203.T` (Toyota)
-        - 🇨🇳 Hong Kong: `0700.HK` (Tencent)
-        - 🇮🇳 India: `RELIANCE.NS`
-        - 🇬🇧 UK: `BP.L`
-        - 🇩🇪 Germany: `SAP.DE`
-        - 🇫🇷 France: `MC.PA`
-        - 🇨🇭 Switzerland: `NESN.SW`
-        - 🇨🇦 Canada: `SHOP.TO`
-        - 🇦🇺 Australia: `CBA.AX`
-        - ₿ Crypto: `BTC-USD`, `ETH-USD`
+        **股票代码格式：**
+        - 🇺🇸 美国：`AAPL`, `MSFT`, `GOOGL`
+        - 🇰🇷 韩国：`005930.KS` （三星）
+        - 🇯🇵 日本：`7203.T` （丰田）
+        - 🇨🇳 香港：`0700.HK` （腾讯）
+        - 🇮🇳 印度：`RELIANCE.NS`
+        - 🇬🇧 英国：`BP.L`
+        - 🇩🇪 德国：`SAP.DE`
+        - 🇫🇷 法国：`MC.PA`
+        - 🇨🇭 瑞士：`NESN.SW`
+        - 🇨🇦 加拿大：`SHOP.TO`
+        - 🇦🇺 澳大利亚：`CBA.AX`
+        - ₿ 加密货币： `BTC-USD`, `ETH-USD`
         
-        **Tips:**
-        - Most US stocks use simple tickers
-        - International stocks have country suffixes
-        - Search by company name if unsure
+        **提示：**
+        - 多数美股使用简短代码
+        - 国际股票代码通常带有市场后缀
+        - 不确定代码时可按公司名称搜索
         """)
     
-    # Prepare query with selected stocks
+    # 准备选定股票的查询
     stock_query = ""
     selected_symbols = []
     if selected_stocks:
-        # Extract just the symbol part (before the space)
+        # 仅提取符号部分（空格之前）
         selected_symbols = [stock.split(" ")[0] for stock in selected_stocks]
-        stock_query = f"What's our risk exposure in {', '.join(selected_symbols)}?"
+        stock_query = f"以下股票有哪些风险敞口：{', '.join(selected_symbols)}？"
     
-    # Example queries section
-    st.markdown("### 💬 Ask Your Question")
+    # 示例查询部分
+    st.markdown("### 💬 提出问题")
     
-    with st.expander("💡 Example Questions"):
+    with st.expander("💡 示例问题"):
         st.markdown("""
-        **General Market Analysis:**
-        - "Analyze AAPL, MSFT, and GOOGL. What's the market trend?"
-        - "What's our risk exposure in tech stocks today?"
-        - "Give me a market brief on SPY and QQQ ETFs"
+        **综合市场分析：**
+        - "分析 AAPL、MSFT 和 GOOGL，当前市场趋势如何？"
+        - "今天科技股有哪些风险敞口？"
+        - "请简要分析 SPY 和 QQQ ETF 的市场情况"
         
-        **International Markets:**
-        - "Compare Samsung (005930.KS) and TSMC performance"
-        - "How are European tech stocks performing? SAP.DE, ASML"
-        - "Analyze Japanese auto makers: 7203.T (Toyota), HMC"
-        - "What's happening with Indian IT stocks? TCS.NS, INFY.NS"
+        **国际市场：**
+        - "比较三星（005930.KS）和台积电的表现"
+        - "欧洲科技股表现如何？SAP.DE、ASML"
+        - "分析日本汽车制造商：7203.T（丰田）、HMC"
+        - "印度 IT 股票表现如何？TCS.NS、INFY.NS"
         
-        **Sector Analysis:**
-        - "What's happening with semiconductor stocks? NVDA, AMD, TSM"
-        - "Analyze Tesla vs traditional auto makers"
-        - "How are cloud software companies performing?"
+        **行业分析：**
+        - "半导体股票近期表现如何？ NVDA, AMD, TSM"
+        - "比较特斯拉与传统汽车制造商"
+        - "云软件公司表现如何？"
         
-        **Cryptocurrency:**
-        - "What's the risk exposure in my crypto portfolio? BTC-USD, ETH-USD"
-        - "Compare Bitcoin and Ethereum performance"
+        **加密货币：**
+        - "我的加密货币投资组合有哪些风险敞口？BTC-USD、ETH-USD"
+        - "比较比特币和以太坊的表现"
         
-        **Portfolio Risk:**
-        - "What's my exposure to the top 5 tech stocks?"
-        - "Analyze risk across my diverse portfolio"
-        - "Should I rebalance based on current market conditions?"
+        **投资组合风险：**
+        - "我对前五大科技股的风险敞口是多少？"
+        - "分析我的多元化投资组合风险"
+        - "根据当前市场情况，我是否应该调整持仓？"
         """)
     
-    # Text query input with default that includes selected stocks
-    query = st.text_input("Enter your market analysis question:", 
-                         value=stock_query if stock_query else "What's our risk exposure in tech stocks today?",
-                         help="Ask about specific stocks, market trends, or portfolio risk")
+    # 默认情况下包含所选股票的文本查询输入
+    query = st.text_input("请输入市场分析问题：",
+                         value=stock_query if stock_query else "今天科技股有哪些风险敞口？",
+                         help="可询问个股、市场趋势或投资组合风险")
     
-    if st.button("Get Brief"):
-        with st.spinner("Processing query..."):
+    if st.button("生成简报"):
+        with st.spinner("正在处理问题……"):
             try:
-                # Check if FastAPI is reachable
+                # 检查 FastAPI 是否可达
                 try:
-                    # Since we're in the same process now, we can directly access FastAPI,
-                    # but we'll still use requests for consistency
+                    # 由于我们现在在同一个进程中，我们可以直接访问FastAPI，
+                    # 但我们仍然会使用请求来保持一致性
                     health_check = requests.get("http://localhost:8000/")
                     if health_check.status_code != 200:
-                        st.error(f"FastAPI server not reachable: {health_check.status_code}")
+                        st.error(f"无法连接 FastAPI 服务：{health_check.status_code}")
                     else:
-                        st.info("FastAPI server is healthy. Processing your request...")
+                        st.info("FastAPI 服务运行正常，正在处理请求……")
                         
-                        # Step 1: Retrieve relevant documents with explicit symbols if selected
+                        # 第 1 步：检索带有明确符号的相关文档（如果选择）
                         params = {"query": query}
                         if selected_symbols:
                             params["symbols"] = ",".join(selected_symbols)
-                            st.info(f"Explicitly requesting analysis for: {', '.join(selected_symbols)}")
+                            st.info(f"正在分析指定股票：{', '.join(selected_symbols)}")
                         
                         retrieve_response = requests.get("http://localhost:8000/retrieve/retrieve", params=params)
                         
                         if retrieve_response.status_code != 200:
-                            st.error(f"Retrieval failed with status {retrieve_response.status_code}")
+                            st.error(f"数据检索失败，状态码：{retrieve_response.status_code}")
                             try:
                                 error_details = retrieve_response.json()
                                 if "error" in error_details:
-                                    st.code(f"Error details: {error_details['error']}")
+                                    st.code(f"错误详情：{error_details['error']}")
                             except:
-                                st.code(f"Raw response: {retrieve_response.text[:500]}...")
+                                st.code(f"原始响应：{retrieve_response.text[:500]}...")
                         else:
                             retrieve_data = retrieve_response.json()
                             
                             if "error" in retrieve_data:
-                                st.error(f"Retrieval error: {retrieve_data['error']}")
+                                st.error(f"数据检索错误：{retrieve_data['error']}")
                             else:
-                                # If we have selected symbols, make sure they're in the data
+                                # 如果我们选择了符号，请确保它们位于数据中
                                 if selected_symbols:
                                     retrieve_data["symbols"] = selected_symbols
                                 
-                                # Display the analyzed stocks
+                                # 显示分析的股票
                                 symbols = retrieve_data.get("symbols", [])
                                 if symbols:
-                                    st.info(f"Analyzing stocks: {', '.join(symbols)}")
+                                    st.info(f"正在分析股票：{', '.join(symbols)}")
                                 
-                                # Display some retrieved data for verification
-                                with st.expander("View retrieved data"):
-                                    st.write("Query:", retrieve_data.get("query"))
-                                    st.write("Context snippets:", retrieve_data.get("context", [])[:2])
-                                    st.write("Markets included:", list(retrieve_data.get("market_data", {}).keys()))
+                                # 显示一些检索到的数据以供验证
+                                with st.expander("查看检索数据"):
+                                    st.write("问题：", retrieve_data.get("query"))
+                                    st.write("上下文片段：", retrieve_data.get("context", [])[:2])
+                                    st.write("涵盖市场：", list(retrieve_data.get("market_data", {}).keys()))
                                 
-                                # Step 2: Analyze and get summary
-                                st.info("Generating market brief...")
+                                # 第二步：分析并总结
+                                st.info("正在生成市场简报……")
                                 analyze_response = requests.post(
                                     "http://localhost:8000/analyze/analyze", 
                                     json={"data": retrieve_data}
                                 )
                                 
                                 if analyze_response.status_code != 200:
-                                    st.error(f"Analysis failed with status {analyze_response.status_code}")
+                                    st.error(f"分析失败，状态码：{analyze_response.status_code}")
                                     try:
                                         error_details = analyze_response.json()
                                         if "error" in error_details:
-                                            st.code(f"Error details: {error_details['error']}")
+                                            st.code(f"错误详情：{error_details['error']}")
                                     except:
-                                        st.code(f"Raw response: {analyze_response.text[:500]}...")
+                                        st.code(f"原始响应：{analyze_response.text[:500]}...")
                                 else:
                                     analyze_data = analyze_response.json()
                                     
                                     if "error" in analyze_data:
-                                        st.error(f"Analysis error: {analyze_data['error']}")
+                                        st.error(f"分析错误：{analyze_data['error']}")
                                     else:
-                                        st.subheader("Market Brief:")
+                                        st.subheader("市场简报：")
                                         st.markdown(analyze_data["summary"])
 
-     # If 2 or more stocks are analyzed, show comparison
+     # 如果分析 2 只或更多股票，请显示比较
                                     if len(selected_symbols) >= 2:
                                         st.divider()
-                                        st.subheader("Side-by-Side Comparison")
+                                        st.subheader("股票并排比较")
                                         
-                                        # Extract market data for comparison
+                                        # 提取市场数据进行比较
                                         market_data = retrieve_data.get("market_data", {})
                                         
                                         if market_data:
-                                            # Prepare comparison data
+                                            # 准备对比数据
                                             comparison_cols = st.columns(len(selected_symbols))
                                             
                                             for idx, symbol in enumerate(selected_symbols):
@@ -954,10 +954,10 @@ def main():
                                                     if symbol in market_data:
                                                         stock_data = market_data[symbol]
                                                         
-                                                        # Display key metrics
+                                                        # 显示关键指标
                                                         if isinstance(stock_data, dict):
                                                             st.metric(
-                                                                "Current Price",
+                                                                "当前价格",
                                                                 f"${stock_data.get('price', 'N/A'):.2f}" if isinstance(stock_data.get('price'), (int, float)) else stock_data.get('price', 'N/A')
                                                             )
                                                             
@@ -966,105 +966,105 @@ def main():
                                                                     change_value = float(stock_data.get('change', 0))
                                                                     change_color = "normal" if change_value >= 0 else "inverse"
                                                                     st.metric(
-                                                                        "Daily Change",
+                                                                        "当日涨跌",
                                                                         f"{change_value:.2f}%",
                                                                         delta_color=change_color
                                                                     )
                                                                 except (ValueError, TypeError):
                                                                     st.metric(
-                                                                        "Daily Change",
+                                                                        "当日涨跌",
                                                                         f"{stock_data.get('change', 'N/A')}"
                                                                     )
                                                             
                                                             if stock_data.get('52_week_high'):
-                                                                st.caption(f"52W High: ${stock_data.get('52_week_high', 'N/A')}")
+                                                                st.caption(f"52 周最高价: ${stock_data.get('52_week_high', 'N/A')}")
                                                             
                                                             if stock_data.get('52_week_low'):
-                                                                st.caption(f"52W Low: ${stock_data.get('52_week_low', 'N/A')}")
+                                                                st.caption(f"52 周最低价: ${stock_data.get('52_week_low', 'N/A')}")
                                                             
                                                             if stock_data.get('market_cap'):
-                                                                st.caption(f"Market Cap: {stock_data.get('market_cap', 'N/A')}")
+                                                                st.caption(f"市值: {stock_data.get('market_cap', 'N/A')}")
                                                             
                                                             if stock_data.get('pe_ratio'):
-                                                                st.caption(f"P/E Ratio: {stock_data.get('pe_ratio', 'N/A')}")
+                                                                st.caption(f"市盈率: {stock_data.get('pe_ratio', 'N/A')}")
                                                         else:
-                                                            # Fallback display for other data types
+                                                            # 其他数据类型的备用显示
                                                             st.write(stock_data)
                                                     else:
-                                                        st.warning(f"No data available for {symbol}")
+                                                        st.warning(f"没有可用数据：{symbol}")
                                         
-                                        # Add detailed line-by-line comparison table
-                                        st.markdown("#### Detailed Metrics Comparison")
+                                        # 添加详细的逐行比较表
+                                        st.markdown("#### 详细指标比较")
                                         
-                                        # Build comparison table from actual market data
+                                        # 根据实际市场数据建立对比表
                                         comparison_data = {}
                                         
                                         for symbol in selected_symbols:
                                             if symbol in market_data:
                                                 stock_data = market_data[symbol]
                                                 
-                                                # If stock_data is a list (serialized DataFrame), calculate metrics
+                                                # 如果stock_data是一个列表（序列化DataFrame），计算指标
                                                 if isinstance(stock_data, list) and len(stock_data) > 0:
                                                     try:
-                                                        # Convert to DataFrame for easier processing
+                                                        # 转换为 DataFrame 以便于处理
                                                         df = pd.DataFrame(stock_data)
                                                         
-                                                        # Calculate metrics from the data
+                                                        # 根据数据计算指标
                                                         latest = df.iloc[-1] if not df.empty else {}
                                                         
                                                         comparison_data[symbol] = {
-                                                            'Current Price': f"${latest.get('Close', 'N/A'):.2f}" if 'Close' in latest and pd.notna(latest.get('Close')) else 'N/A',
-                                                            'Daily Change %': f"{((latest.get('Close', 0) - df.iloc[-2].get('Close', 0)) / df.iloc[-2].get('Close', 1) * 100):.2f}%" if len(df) > 1 and 'Close' in latest else 'N/A',
-                                                            '52W High': f"${df['High'].max():.2f}" if 'High' in df.columns else 'N/A',
-                                                            '52W Low': f"${df['Low'].min():.2f}" if 'Low' in df.columns else 'N/A',
-                                                            'Avg Volume': f"{df['Volume'].mean():,.0f}" if 'Volume' in df.columns else 'N/A',
-                                                            'Latest Volume': f"{latest.get('Volume', 'N/A'):,.0f}" if 'Volume' in latest and pd.notna(latest.get('Volume')) else 'N/A'
+                                                            '当前价格': f"${latest.get('Close', 'N/A'):.2f}" if 'Close' in latest and pd.notna(latest.get('Close')) else 'N/A',
+                                                            '当日涨跌幅': f"{((latest.get('Close', 0) - df.iloc[-2].get('Close', 0)) / df.iloc[-2].get('Close', 1) * 100):.2f}%" if len(df) > 1 and 'Close' in latest else 'N/A',
+                                                            '52 周最高价': f"${df['High'].max():.2f}" if 'High' in df.columns else 'N/A',
+                                                            '52 周最低价': f"${df['Low'].min():.2f}" if 'Low' in df.columns else 'N/A',
+                                                            '平均成交量': f"{df['Volume'].mean():,.0f}" if 'Volume' in df.columns else 'N/A',
+                                                            '最新成交量': f"{latest.get('Volume', 'N/A'):,.0f}" if 'Volume' in latest and pd.notna(latest.get('Volume')) else 'N/A'
                                                         }
                                                     except Exception as e:
                                                         logger.warning(f"Error calculating metrics for {symbol}: {str(e)}")
                                                         comparison_data[symbol] = {
-                                                            'Current Price': 'N/A',
-                                                            'Daily Change %': 'N/A',
-                                                            '52W High': 'N/A',
-                                                            '52W Low': 'N/A',
-                                                            'Avg Volume': 'N/A',
-                                                            'Latest Volume': 'N/A'
+                                                            '当前价格': 'N/A',
+                                                            '当日涨跌幅': 'N/A',
+                                                            '52 周最高价': 'N/A',
+                                                            '52 周最低价': 'N/A',
+                                                            '平均成交量': 'N/A',
+                                                            '最新成交量': 'N/A'
                                                         }
-                                                # If stock_data is already a dict with metrics
+                                                # 如果 stock_data 已经是一个带有指标的字典
                                                 elif isinstance(stock_data, dict):
                                                     comparison_data[symbol] = {
-                                                        'Current Price': f"${stock_data.get('price', 'N/A'):.2f}" if isinstance(stock_data.get('price'), (int, float)) else stock_data.get('price', 'N/A'),
-                                                        'Daily Change %': f"{stock_data.get('change', 'N/A')}%",
-                                                        '52W High': stock_data.get('52_week_high', 'N/A'),
-                                                        '52W Low': stock_data.get('52_week_low', 'N/A'),
-                                                        'Market Cap': stock_data.get('market_cap', 'N/A'),
-                                                        'P/E Ratio': stock_data.get('pe_ratio', 'N/A')
+                                                        '当前价格': f"${stock_data.get('price', 'N/A'):.2f}" if isinstance(stock_data.get('price'), (int, float)) else stock_data.get('price', 'N/A'),
+                                                        '当日涨跌幅': f"{stock_data.get('change', 'N/A')}%",
+                                                        '52 周最高价': stock_data.get('52_week_high', 'N/A'),
+                                                        '52 周最低价': stock_data.get('52_week_low', 'N/A'),
+                                                        '市值': stock_data.get('market_cap', 'N/A'),
+                                                        '市盈率': stock_data.get('pe_ratio', 'N/A')
                                                     }
                                                 else:
-                                                    comparison_data[symbol] = {'Status': 'No data available'}
+                                                    comparison_data[symbol] = {'Status': '暂无数据'}
                                             else:
-                                                comparison_data[symbol] = {'Status': 'Symbol not found'}
+                                                comparison_data[symbol] = {'Status': '未找到股票代码'}
                                         
-                                        # Create and display comparison dataframe
+                                        # 创建并显示比较数据框
                                         if comparison_data:
                                             comparison_df = pd.DataFrame(comparison_data)
                                             st.dataframe(comparison_df, use_container_width=True)
                                         else:
-                                            st.info("No data available for comparison table")
+                                            st.info("没有可用于比较的数据")
                                     
-                                    st.success("Query processed successfully!")
+                                    st.success("问题处理完成！")
                                     
-                                    # If 2 or more stocks are analyzed, show comparison graphs
+                                    # 如果分析 2 只或更多股票，请显示比较图
                                     if len(selected_symbols) >= 2:
                                         st.divider()
-                                        st.subheader("Stock Price Comparison Charts")
+                                        st.subheader("股价比较图")
                                         
-                                        # Extract market data for graphing
+                                        # 提取市场数据以绘制图表
                                         market_data_raw = retrieve_data.get("market_data", {})
                                         
                                         if market_data_raw:
                                             try:
-                                                # Create price comparison chart
+                                                # 创建价格比较图表
                                                 fig_price, ax_price = plt.subplots(figsize=(12, 6))
                                                 
                                                 has_data = False
@@ -1073,7 +1073,7 @@ def main():
                                                         stock_data = market_data_raw[symbol]
                                                         
                                                         if isinstance(stock_data, list) and len(stock_data) > 0:
-                                                            # Extract closing prices from serialized data
+                                                            # 从序列化数据中提取收盘价
                                                             dates = []
                                                             closes = []
                                                             
@@ -1088,17 +1088,17 @@ def main():
                                                                 has_data = True
                                                 
                                                 if has_data:
-                                                    ax_price.set_xlabel('Trading Days', fontsize=11, fontweight='bold')
-                                                    ax_price.set_ylabel('Closing Price (USD)', fontsize=11, fontweight='bold')
-                                                    ax_price.set_title('Stock Price Comparison Over Time', fontsize=13, fontweight='bold')
+                                                    ax_price.set_xlabel('交易日', fontsize=11, fontweight='bold')
+                                                    ax_price.set_ylabel('收盘价（美元）', fontsize=11, fontweight='bold')
+                                                    ax_price.set_title('股价走势比较', fontsize=13, fontweight='bold')
                                                     ax_price.legend(loc='best', fontsize=10)
                                                     ax_price.grid(True, alpha=0.3)
                                                     plt.tight_layout()
                                                     st.pyplot(fig_price)
                                                 else:
-                                                    st.warning("No price data available for charting")
+                                                    st.warning("没有可用于绘图的价格数据")
                                                 
-                                                # Create volume comparison chart if data exists
+                                                # 如果数据存在，则创建体积比较图
                                                 fig_volume, ax_volume = plt.subplots(figsize=(12, 6))
                                                 
                                                 has_volume = False
@@ -1125,15 +1125,15 @@ def main():
                                                                 has_volume = True
                                                 
                                                 if has_volume:
-                                                    ax_volume.set_xlabel('Trading Days', fontsize=11, fontweight='bold')
-                                                    ax_volume.set_ylabel('Trading Volume (Millions)', fontsize=11, fontweight='bold')
-                                                    ax_volume.set_title('Stock Trading Volume Comparison', fontsize=13, fontweight='bold')
+                                                    ax_volume.set_xlabel('交易日', fontsize=11, fontweight='bold')
+                                                    ax_volume.set_ylabel('成交量（百万）', fontsize=11, fontweight='bold')
+                                                    ax_volume.set_title('股票成交量比较', fontsize=13, fontweight='bold')
                                                     ax_volume.legend(loc='best', fontsize=10)
                                                     ax_volume.grid(True, alpha=0.3, axis='y')
                                                     plt.tight_layout()
                                                     st.pyplot(fig_volume)
                                                 
-                                                # Create normalized price performance chart
+                                                # 创建标准化性价比图表
                                                 fig_perf, ax_perf = plt.subplots(figsize=(12, 6))
                                                 
                                                 has_perf = False
@@ -1149,25 +1149,25 @@ def main():
                                                                     closes.append(float(record['Close']))
                                                             
                                                             if closes:
-                                                                # Normalize to starting price (100)
+                                                                # 标准化为起始价格 (100)
                                                                 normalized = [(c / closes[0] * 100) - 100 for c in closes]
                                                                 ax_perf.plot(range(len(normalized)), normalized, marker='o', label=symbol, linewidth=2)
                                                                 has_perf = True
                                                 
                                                 if has_perf:
                                                     ax_perf.axhline(y=0, color='r', linestyle='--', alpha=0.5)
-                                                    ax_perf.set_xlabel('Trading Days', fontsize=11, fontweight='bold')
-                                                    ax_perf.set_ylabel('% Change from Start', fontsize=11, fontweight='bold')
-                                                    ax_perf.set_title('Normalized Price Performance (%)', fontsize=13, fontweight='bold')
+                                                    ax_perf.set_xlabel('交易日', fontsize=11, fontweight='bold')
+                                                    ax_perf.set_ylabel('较起点涨跌幅（%）', fontsize=11, fontweight='bold')
+                                                    ax_perf.set_title('标准化股价表现（%）', fontsize=13, fontweight='bold')
                                                     ax_perf.legend(loc='best', fontsize=10)
                                                     ax_perf.grid(True, alpha=0.3)
                                                     plt.tight_layout()
                                                     st.pyplot(fig_perf)
                                                 
-                                                st.success("Stock comparison charts generated successfully!")
+                                                st.success("股票比较图已生成！")
                                                 
                                             except Exception as e:
-                                                st.warning(f"Could not generate charts: {str(e)}")
+                                                st.warning(f"无法生成图表：{str(e)}")
                                                 logger.warning(f"Error generating charts: {str(e)}")
                                                 
                                                 
@@ -1177,21 +1177,21 @@ def main():
         
 
                 except requests.exceptions.ConnectionError:
-                    st.error("FastAPI server is trying to connect to Render services. If it takes long, try running it locally.")
+                    st.error("FastAPI 服务正在连接 Render；如果等待过久，请尝试在本地运行。")
             except Exception as e:
-                st.error(f"Failed to process query: {str(e)}")
+                st.error(f"处理问题失败：{str(e)}")
     
-    # Audio query input (optional for voice I/O)
-    st.subheader("Or upload an audio query (WAV/MP3)")
-    audio_file = st.file_uploader("Upload audio", type=["wav", "mp3"])
+    # 音频查询输入（语音I/O可选）
+    st.subheader("或上传语音问题（WAV/MP3）")
+    audio_file = st.file_uploader("上传音频", type=["wav", "mp3"])
     
     if audio_file is not None:
         st.audio(audio_file, format="audio/wav")
-        with st.spinner("Processing audio query..."):
+        with st.spinner("正在处理语音问题……"):
             try:
                 files = {"audio": (audio_file.name, audio_file, "audio/wav")}
                 
-                # If we have selected symbols, add them as form data
+                # 如果我们选择了符号，请将它们添加为表单数据
                 data = {}
                 if selected_symbols:
                     data = {"symbols": ",".join(selected_symbols)}
@@ -1201,44 +1201,35 @@ def main():
                 if response.status_code == 200:
                     audio_bytes = io.BytesIO(response.content)
                     st.audio(audio_bytes, format="audio/mp3")
-                    st.success("Audio query processed successfully!")
+                    st.success("语音问题处理完成！")
                 else:
                     try:
-                        error_msg = response.json().get("error", "Unknown error")
-                        st.error(f"Audio processing error: {error_msg}")
+                        error_msg = response.json().get("error", "未知错误")
+                        st.error(f"音频处理错误：{error_msg}")
                     except:
-                        st.error(f"Audio processing failed with status {response.status_code}")
+                        st.error(f"音频处理失败，状态码：{response.status_code}")
             except requests.exceptions.ConnectionError:
-                st.error("FastAPI server is trying to connect to Render services. If it takes long, try running it locally.")
+                st.error("FastAPI 服务正在连接 Render；如果等待过久，请尝试在本地运行。")
             except Exception as e:
-                st.error(f"Failed to process audio query: {str(e)}")
+                st.error(f"处理语音问题失败：{str(e)}")
     
-    # Add a section to explain how the application works
-    with st.expander("How this application works"):
+    # 添加一个部分来解释应用程序的工作原理
+    with st.expander("应用工作原理"):
         st.write("""
-        ### Architecture
-        
-        This application combines both FastAPI and Streamlit in a single process:
-        
-        1. **FastAPI Backend**: Runs in a background thread on port 8000
-           - Orchestrates multiple AI agents for data processing
-           - Handles API requests from the Streamlit frontend
-        
-        2. **Streamlit Frontend**: The user interface you're seeing now
-           - Provides a friendly way to interact with the system
-           - Makes API calls to the FastAPI backend
-        
-        3. **AI Agents**:
-           - **API Agent**: Fetches market data via yfinance
-           - **Scraping Agent**: Crawls news using newspaper3k  
-           - **Retriever Agent**: Indexes and retrieves data
-           - **Analysis Agent**: Calculates risk exposure
-           - **Language Agent**: Generates narratives
-           - **Voice Agent**: Handles speech-to-text and text-to-speech
-        
-        When you ask a question, the system analyzes stock data, retrieves relevant news, 
-        calculates portfolio exposure, and generates a comprehensive market brief.
-        """)
+    ### 系统架构
+
+    本应用由 Streamlit 前端和 FastAPI 后端组成。前端负责股票选择、提问和结果展示；后端协调数据获取、风险分析与简报生成。
+
+    ### 分析流程
+
+    提问 → 获取 Yahoo Finance 市场数据 → 检索相关信息 → 评估投资组合风险 → 生成市场简报。
+
+    ### 功能
+
+    - 覆盖全球股票、ETF、指数和主要加密货币
+    - 展示市场数据、新闻信息和投资组合风险
+    - 生成盈利分析与 AI 市场简报
+    """)
 
 
 if __name__ == "__main__":

@@ -1,130 +1,129 @@
 #!/bin/bash
 
-# This script helps set up and run the Morning Market Brief Assistant
-# in various configurations based on your needs.
+# 此脚本用于以不同方式配置和运行晨间市场简报助手。
 
 show_help() {
-    echo "Morning Market Brief Assistant Setup Script"
+    echo "晨间市场简报助手启动脚本"
     echo ""
-    echo "Usage: ./setup.sh [options]"
+    echo "用法：./setup.sh [选项]"
     echo ""
-    echo "Options:"
-    echo "  --docker        Run using Docker Compose (both services)"
-    echo "  --local         Run both services locally (no Docker)"
-    echo "  --fastapi       Run only the FastAPI service locally"
-    echo "  --streamlit     Run only the Streamlit service locally"
-    echo "  --help          Show this help message"
+    echo "选项："
+    echo "  --docker        使用 Docker Compose 启动两个服务"
+    echo "  --local         在本地启动两个服务"
+    echo "  --fastapi       仅在本地启动 FastAPI 服务"
+    echo "  --streamlit     仅在本地启动 Streamlit 服务"
+    echo "  --help          显示帮助信息"
     echo ""
-    echo "Examples:"
-    echo "  ./setup.sh --docker     # Run both services with Docker"
-    echo "  ./setup.sh --local      # Run both services locally"
+    echo "示例："
+    echo "  ./setup.sh --docker     # 使用 Docker 启动两个服务"
+    echo "  ./setup.sh --local      # 在本地启动两个服务"
     echo ""
 }
 
 setup_secrets() {
-    # Create .streamlit directory if it doesn't exist
+    # 若 .streamlit 目录不存在则创建
     if [ ! -d ".streamlit" ]; then
-        echo "Creating .streamlit directory..."
+        echo "正在创建 .streamlit 目录……"
         mkdir -p .streamlit
     fi
 
-    # Create secrets.toml if it doesn't exist
+    # 若 secrets.toml 文件不存在则创建
     if [ ! -f ".streamlit/secrets.toml" ]; then
-        echo "Creating .streamlit/secrets.toml file..."
+        echo "正在创建 .streamlit/secrets.toml 文件……"
         echo '[server]
 API_URL = "http://localhost:8000"' > .streamlit/secrets.toml
-        echo "Secrets file created successfully."
+        echo "配置文件创建成功。"
     else
-        echo "Secrets file already exists."
+        echo "配置文件已存在。"
     fi
 }
 
 run_docker() {
-    echo "Starting services with Docker Compose..."
+    echo "正在通过 Docker Compose 启动服务……"
     docker-compose up --build
 }
 
 run_local() {
-    echo "Setting up for local development..."
+    echo "正在配置本地开发环境……"
     setup_secrets
     
-    # Check if Python virtual environment exists
+    # 检查 Python 虚拟环境是否存在
     if [ ! -d "venv" ]; then
-        echo "Creating Python virtual environment..."
+        echo "正在创建 Python 虚拟环境……"
         python -m venv venv
     fi
     
-    # Activate virtual environment
-    echo "Activating virtual environment..."
+    # 激活虚拟环境
+    echo "正在激活虚拟环境……"
     source venv/bin/activate
     
-    # Install requirements
-    echo "Installing requirements..."
+    # 安装依赖
+    echo "正在安装依赖……"
     pip install -r requirements.txt
     
-    # Run both services
-    echo "Starting FastAPI and Streamlit services..."
-    echo "Starting FastAPI on port 8000..."
+    # 运行两个服务
+    echo "正在启动 FastAPI 和 Streamlit 服务……"
+    echo "正在 8000 端口启动 FastAPI……"
     uvicorn orchestrator.orchestrator:app --host 0.0.0.0 --port 8000 &
     FASTAPI_PID=$!
     
-    # Wait for FastAPI to start
-    echo "Waiting for FastAPI to start..."
+    # 等待 FastAPI 启动
+    echo "正在等待 FastAPI 启动……"
     sleep 5
     
-    echo "Starting Streamlit on port 8501..."
+    echo "正在 8501 端口启动 Streamlit……"
     streamlit run streamlit_app/app.py
     
-    # When Streamlit exits, kill FastAPI
+    # Streamlit 退出时停止 FastAPI
     kill $FASTAPI_PID
 }
 
 run_fastapi() {
-    echo "Setting up for FastAPI service..."
+    echo "正在配置 FastAPI 服务……"
     
-    # Check if Python virtual environment exists
+    # 检查 Python 虚拟环境是否存在
     if [ ! -d "venv" ]; then
-        echo "Creating Python virtual environment..."
+        echo "正在创建 Python 虚拟环境……"
         python -m venv venv
     fi
     
-    # Activate virtual environment
-    echo "Activating virtual environment..."
+    # 激活虚拟环境
+    echo "正在激活虚拟环境……"
     source venv/bin/activate
     
-    # Install requirements
-    echo "Installing requirements..."
+    # 安装依赖
+    echo "正在安装依赖……"
     pip install -r requirements.txt
     
-    # Run FastAPI service
-    echo "Starting FastAPI on port 8000..."
+    # 运行 FastAPI 服务
+    echo "正在 8000 端口启动 FastAPI……"
     uvicorn orchestrator.orchestrator:app --host 0.0.0.0 --port 8000
 }
 
 run_streamlit() {
-    echo "Setting up for Streamlit service..."
+    echo "正在配置 Streamlit 服务……"
     setup_secrets
     
-    # Check if Python virtual environment exists
+    # 检查 Python 虚拟环境是否存在
     if [ ! -d "venv" ]; then
-        echo "Creating Python virtual environment..."
+        echo "正在创建 Python 虚拟环境……"
         python -m venv venv
     fi
     
-    # Activate virtual environment
-    echo "Activating virtual environment..."
+    # 激活虚拟环境
+    echo "正在激活虚拟环境……"
     source venv/bin/activate
     
-    # Install requirements
-    echo "Installing requirements..."
+    # 安装依赖
+    echo "正在安装依赖……"
     pip install -r requirements.txt
     
-    # Run Streamlit service
-    echo "Starting Streamlit on port 8501..."
+    # 运行 Streamlit 服务
+    echo "正在 8501 端口启动 Streamlit……"
     streamlit run streamlit_app/app.py
 }
 
-# Process command line arguments
+# 处理命令行参数
 if [ $# -eq 0 ]; then
     show_help
     exit 0
@@ -147,7 +146,7 @@ case "$1" in
         show_help
         ;;
     *)
-        echo "Unknown option: $1"
+        echo "未知选项：$1"
         show_help
         exit 1
         ;;

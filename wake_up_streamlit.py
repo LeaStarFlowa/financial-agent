@@ -1,11 +1,9 @@
-"""
-Wake-up script for Streamlit Cloud apps.
+"""Streamlit Cloud 应用程序的唤醒脚本。
 
-Uses curl to check if apps are sleeping, then launches Selenium
-(headless Chrome) only when needed to click the "Wake Up" button.
+使用curl检查应用程序是否正在睡眠，然后启动Selenium
+（无头 Chrome）仅在需要时单击“唤醒”按钮。
 
-Based on: https://github.com/Aditya190803/st-awake-template
-"""
+基于：https://github.com/Aditya190803/st-awake-template"""
 
 import asyncio
 import datetime
@@ -23,7 +21,7 @@ from selenium.webdriver.common.by import By
 from streamlit_apps import STREAMLIT_APPS
 
 
-# ── Configuration (override via env vars) ────────────────────────────────────
+# ── 配置（通过环境变量覆盖）────────────────────────────────────
 
 BROWSER_PAGELOAD_TIMEOUT_SECONDS = float(
     os.getenv("BROWSER_PAGELOAD_TIMEOUT_SECONDS", "5")
@@ -45,7 +43,7 @@ ENFORCE_WAKE_INTERVAL = os.getenv("ENFORCE_WAKE_INTERVAL", "0").strip().lower() 
     "on",
 }
 
-# ── Sleep detection markers ──────────────────────────────────────────────────
+# ── 睡眠检测标记──────────────────────────────────────────────────
 
 SLEEP_TEXT_MARKERS = (
     "yes, get this app back up!",
@@ -70,7 +68,7 @@ UNIQUE_STREAMLIT_APPS = list(dict.fromkeys(STREAMLIT_APPS))
 LOG_LOCK = threading.Lock()
 
 
-# ── Helpers ──────────────────────────────────────────────────────────────────
+# ── 助手──────────────────────────────────────────────────────────────────
 
 def log_message(log_file, message: str) -> None:
     timestamped = f"[{datetime.datetime.now()}] {message}"
@@ -113,7 +111,7 @@ def write_state() -> None:
         json.dump(state, state_file)
 
 
-# ── Browser / Selenium helpers ───────────────────────────────────────────────
+# ── 浏览器 / Selenium 助手 ────────────────────────────────────────────────
 
 def create_driver():
     options = Options()
@@ -242,7 +240,7 @@ def check_site(url: str) -> tuple[str, str]:
         driver.quit()
 
 
-# ── Async orchestration ──────────────────────────────────────────────────────
+# ── 异步编排──────────────────────────────────────────────────────
 
 async def process_site(
     index: int, total: int, url: str, log_file, semaphore
